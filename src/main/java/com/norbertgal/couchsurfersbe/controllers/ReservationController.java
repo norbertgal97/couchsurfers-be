@@ -1,6 +1,7 @@
 package com.norbertgal.couchsurfersbe.controllers;
 
-import com.norbertgal.couchsurfersbe.api.v1.model.OwnReservationListDTO;
+import com.norbertgal.couchsurfersbe.api.v1.model.OwnReservationDTO;
+import com.norbertgal.couchsurfersbe.api.v1.model.OwnReservationPreviewListDTO;
 import com.norbertgal.couchsurfersbe.services.ReservationService;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -18,14 +19,19 @@ public class ReservationController {
 
     @GetMapping(value = "/all")
     @ResponseStatus(HttpStatus.OK)
-    public OwnReservationListDTO getListOfReservations() {
-        return new OwnReservationListDTO(reservationService.getAllReservations());
+    public OwnReservationPreviewListDTO getListOfReservations() {
+        return new OwnReservationPreviewListDTO(reservationService.getAllReservations());
     }
 
-    @GetMapping(value = "/query")
+    @GetMapping(value = "/query/reservations")
     @ResponseStatus(HttpStatus.OK)
-    public OwnReservationListDTO getOwnReservations(@RequestParam(name = "userid") Long userId) {
-        System.out.println("userId = " + userId);
-        return new OwnReservationListDTO(reservationService.getOwnReservations(userId));
+    public OwnReservationPreviewListDTO getOwnReservations(@RequestParam(name = "userid") Long userId) {
+        return new OwnReservationPreviewListDTO(reservationService.getOwnReservations(userId));
+    }
+
+    @GetMapping(value = "/query/reservation")
+    @ResponseStatus(HttpStatus.OK)
+    public OwnReservationDTO getOwnReservation(@RequestParam(name = "userid") Long userId, @RequestParam(name = "couchid") Long couchId) {
+        return reservationService.getOwnReservation(userId, couchId);
     }
 }

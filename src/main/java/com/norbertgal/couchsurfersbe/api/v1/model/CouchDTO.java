@@ -5,7 +5,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.Date;
 import java.util.List;
 
 @Data
@@ -31,8 +30,7 @@ public class CouchDTO {
 
     private LocationDTO location;
 
+    @JsonProperty("couch_photos")
     private List<CouchPhotoDTO> couchPhotos;
 
-    @JsonProperty("created_at")
-    private Date createdAt;
 }

@@ -1,12 +1,15 @@
 package com.norbertgal.couchsurfersbe.services;
 
 import com.norbertgal.couchsurfersbe.api.v1.model.OwnReservationDTO;
+import com.norbertgal.couchsurfersbe.api.v1.model.OwnReservationPreviewDTO;
 
 import java.util.List;
 
 public interface ReservationService {
 
-    List<OwnReservationDTO> getAllReservations();
+    List<OwnReservationPreviewDTO> getAllReservations();
 
-    List<OwnReservationDTO> getOwnReservations(Long userId);
+    List<OwnReservationPreviewDTO> getOwnReservations(Long userId);
+
+    OwnReservationDTO getOwnReservation(Long userId, Long couchId);
 }
