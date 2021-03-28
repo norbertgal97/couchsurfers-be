@@ -1,9 +1,13 @@
 package com.norbertgal.couchsurfersbe.repositories;
 
 import com.norbertgal.couchsurfersbe.domain.Reservation;
-import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface ReservationRepository extends CrudRepository<Reservation, Long> {
+import java.util.List;
 
-    Iterable<Reservation> findByUserId(Long userId);
+public interface ReservationRepository extends JpaRepository<Reservation, Long> {
+
+    List<Reservation> findByUserId(Long userId);
+
+    Reservation findByUserIdAndCouchId(Long userId, Long couchId);
 }

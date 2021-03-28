@@ -9,6 +9,6 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class OwnReservationListDTO {
-    List<OwnReservationDTO> reservations;
+public class OwnReservationPreviewListDTO {
+    List<OwnReservationPreviewDTO> reservations;
 }

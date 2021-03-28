@@ -9,12 +9,13 @@ import org.mapstruct.factory.Mappers;
 
 @Mapper(componentModel = "spring")
 public interface OwnReservationMapper {
-    OwnReservationMapper INSTANCE = Mappers.getMapper(OwnReservationMapper.class);
+    OwnReservationPreviewMapper INSTANCE = Mappers.getMapper(OwnReservationPreviewMapper.class);
 
     @Mappings({
-            @Mapping(target = "couch", source = "reservation.couch")
+            @Mapping(target = "couch", source = "reservation.couch"),
+            @Mapping(target = "couchId", source = "reservation.couch.id"),
+            @Mapping(target = "userId", source = "reservation.user.id")
     })
-    OwnReservationDTO reservationToReservationDTO(Reservation reservation);
+    OwnReservationDTO toOwnReservationDTO(Reservation reservation);
 
-    Reservation reservationDTOtoReservation(OwnReservationDTO reservationDTO);
 }

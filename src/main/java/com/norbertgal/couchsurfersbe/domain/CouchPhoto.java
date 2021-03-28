@@ -17,6 +17,7 @@ public class CouchPhoto extends BaseEntity {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @Column(name = "photo")
-    private Byte[] photo;
+    @Column(name = "photo", columnDefinition = "BLOB")
+    @Lob
+    private byte[] photo;
 }

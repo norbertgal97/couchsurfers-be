@@ -12,17 +12,22 @@ import java.util.*;
 public class ReservationServiceDummy implements ReservationService {
 
     @Override
-    public List<OwnReservationDTO> getAllReservations() {
+    public List<OwnReservationPreviewDTO> getAllReservations() {
         return getOwnReservationDTOs();
     }
 
     @Override
-    public List<OwnReservationDTO> getOwnReservations(Long userId) {
+    public List<OwnReservationPreviewDTO> getOwnReservations(Long userId) {
         return getOwnReservationDTOs();
     }
 
-    private List<OwnReservationDTO> getOwnReservationDTOs() {
-        OwnReservationDTO reservation = new OwnReservationDTO();
+    @Override
+    public OwnReservationDTO getOwnReservation(Long userId, Long couchId) {
+        return null;
+    }
+
+    private List<OwnReservationPreviewDTO> getOwnReservationDTOs() {
+        OwnReservationPreviewDTO reservation = new OwnReservationPreviewDTO();
 
         CouchDTO couchDTO = new CouchDTO();
         couchDTO.setId(1L);
@@ -34,7 +39,6 @@ public class ReservationServiceDummy implements ReservationService {
         couchDTO.setNumberOfGuests(3);
         couchDTO.setNumberOfRooms(2);
         couchDTO.setPrice(10.3);
-        couchDTO.setCreatedAt(new GregorianCalendar(2021, Calendar.JANUARY, 8).getTime());
 
         LocationDTO locationDTO = new LocationDTO();
         locationDTO.setBuildingNumber("79/a");
@@ -50,12 +54,14 @@ public class ReservationServiceDummy implements ReservationService {
         couchDTO.setCouchPhotos(couchPhotoDTOs);
         couchDTO.getCouchPhotos().add(couchPhotoDTO);
 
-        reservation.setCouch(couchDTO);
         reservation.setEndDate(new GregorianCalendar(2021, Calendar.FEBRUARY, 15).getTime());
         reservation.setStartDate(new GregorianCalendar(2021, Calendar.FEBRUARY, 11).getTime());
-        reservation.setNumberOfGuests(3);
+        reservation.setAmenities(couchDTO.getAmenities());
+        reservation.setCouchPhoto(couchPhotoDTO);
+        reservation.setLocation(couchDTO.getLocation());
+        reservation.setRating(4.3);
 
-        List<OwnReservationDTO> reservations = new ArrayList<>();
+        List<OwnReservationPreviewDTO> reservations = new ArrayList<>();
         reservations.add(reservation);
 
         return reservations;
