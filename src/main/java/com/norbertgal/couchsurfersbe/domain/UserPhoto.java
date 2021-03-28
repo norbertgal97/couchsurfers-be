@@ -18,5 +18,5 @@ public class UserPhoto extends BaseEntity {
     private User user;
 
     @Column(name = "photo")
-    private Byte[] photo;
+    private byte[] photo;
 }
