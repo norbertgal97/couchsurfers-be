@@ -58,13 +58,13 @@ public class UserServiceImpl implements UserService {
     @Override
     public PersonalInformationDTO getPersonalInformation(Long userId) {
         Optional<User> user = userRepository.findById(userId);
-        return user.isPresent() ? personalInformationMapper.toPersonalInformationDTO(user.get()) : new PersonalInformationDTO();
+        return user.map(personalInformationMapper::toPersonalInformationDTO).orElse(null);
     }
 
     @Override
     public ProfileDTO getProfile(Long userId) {
         Optional<User> user = userRepository.findById(userId);
-        return user.isPresent() ? profileMapper.toProfileDTO(user.get()) : new ProfileDTO();
+        return user.map(profileMapper::toProfileDTO).orElse(null);
     }
 
     @Override

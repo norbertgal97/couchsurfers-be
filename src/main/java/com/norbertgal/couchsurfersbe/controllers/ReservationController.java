@@ -4,6 +4,7 @@ import com.norbertgal.couchsurfersbe.api.v1.model.OwnReservationDTO;
 import com.norbertgal.couchsurfersbe.api.v1.model.OwnReservationPreviewListDTO;
 import com.norbertgal.couchsurfersbe.services.ReservationService;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -18,20 +19,20 @@ public class ReservationController {
     }
 
     @GetMapping(value = "/all")
-    @ResponseStatus(HttpStatus.OK)
-    public OwnReservationPreviewListDTO getListOfReservations() {
-        return new OwnReservationPreviewListDTO(reservationService.getAllReservations());
+    public ResponseEntity<OwnReservationPreviewListDTO> getListOfReservations() {
+        return new ResponseEntity<>(new OwnReservationPreviewListDTO(reservationService.getAllReservations()), HttpStatus.OK);
     }
 
     @GetMapping(value = "/query/reservations")
-    @ResponseStatus(HttpStatus.OK)
-    public OwnReservationPreviewListDTO getOwnReservations(@RequestParam(name = "userid") Long userId) {
-        return new OwnReservationPreviewListDTO(reservationService.getOwnReservations(userId));
+    public ResponseEntity<OwnReservationPreviewListDTO> getOwnReservations(@RequestParam(name = "userid") Long userId) {
+        return new ResponseEntity<>(new OwnReservationPreviewListDTO(reservationService.getOwnReservations(userId)), HttpStatus.OK);
     }
 
     @GetMapping(value = "/query/reservation")
-    @ResponseStatus(HttpStatus.OK)
-    public OwnReservationDTO getOwnReservation(@RequestParam(name = "userid") Long userId, @RequestParam(name = "couchid") Long couchId) {
-        return reservationService.getOwnReservation(userId, couchId);
+    public ResponseEntity<OwnReservationDTO> getOwnReservation(@RequestParam(name = "userid") Long userId, @RequestParam(name = "couchid") Long couchId) {
+        OwnReservationDTO ownReservation = reservationService.getOwnReservation(userId, couchId);
+        if (ownReservation != null)
+            return new ResponseEntity<>(ownReservation, HttpStatus.OK);
+        return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
     }
 }
