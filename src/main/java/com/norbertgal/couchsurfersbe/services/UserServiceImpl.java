@@ -2,8 +2,13 @@ package com.norbertgal.couchsurfersbe.services;
 
 import com.norbertgal.couchsurfersbe.api.v1.mapper.PersonalInformationMapper;
 import com.norbertgal.couchsurfersbe.api.v1.mapper.ProfileMapper;
+import com.norbertgal.couchsurfersbe.api.v1.mapper.UserMapper;
 import com.norbertgal.couchsurfersbe.api.v1.model.PersonalInformationDTO;
 import com.norbertgal.couchsurfersbe.api.v1.model.ProfileDTO;
+import com.norbertgal.couchsurfersbe.api.v1.model.StatusDTO;
+import com.norbertgal.couchsurfersbe.api.v1.model.UserDTO;
+import com.norbertgal.couchsurfersbe.api.v1.model.exception.AlreadyRegisteredEmailException;
+import com.norbertgal.couchsurfersbe.api.v1.model.exception.NotFoundException;
 import com.norbertgal.couchsurfersbe.api.v1.model.request.LoginRequestDTO;
 import com.norbertgal.couchsurfersbe.api.v1.model.request.SignUpRequestDTO;
 import com.norbertgal.couchsurfersbe.domain.User;
@@ -33,6 +38,7 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final PersonalInformationMapper personalInformationMapper;
     private final ProfileMapper profileMapper;
+    private final UserMapper userMapper;
     private final AuthenticationManager authenticationManager;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
     private final HttpServletRequest httpServletRequest;
@@ -42,6 +48,7 @@ public class UserServiceImpl implements UserService {
     public UserServiceImpl(UserRepository userRepository,
                            PersonalInformationMapper personalInformationMapper,
                            ProfileMapper profileMapper,
+                           UserMapper userMapper,
                            AuthenticationManager authenticationManager,
                            BCryptPasswordEncoder bCryptPasswordEncoder,
                            HttpServletRequest httpServletRequest,
@@ -49,6 +56,7 @@ public class UserServiceImpl implements UserService {
         this.userRepository = userRepository;
         this.personalInformationMapper = personalInformationMapper;
         this.profileMapper = profileMapper;
+        this.userMapper = userMapper;
         this.authenticationManager = authenticationManager;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
         this.httpServletRequest = httpServletRequest;
@@ -56,36 +64,44 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public PersonalInformationDTO getPersonalInformation(Long userId) {
-        Optional<User> user = userRepository.findById(userId);
-        return user.map(personalInformationMapper::toPersonalInformationDTO).orElse(null);
+    public PersonalInformationDTO getPersonalInformation(Long userId) throws NotFoundException {
+        Optional<User> optionalUser = userRepository.findById(userId);
+
+        if (optionalUser.isEmpty())
+            throw new NotFoundException(StatusDTO.builder().timestamp(new Date()).errorCode(404).errorMessage("PersonalInformation is not found!").build());
+
+        return personalInformationMapper.toPersonalInformationDTO(optionalUser.get());
     }
 
     @Override
-    public ProfileDTO getProfile(Long userId) {
-        Optional<User> user = userRepository.findById(userId);
-        return user.map(profileMapper::toProfileDTO).orElse(null);
+    public ProfileDTO getProfile(Long userId) throws NotFoundException {
+        Optional<User> optionalUser = userRepository.findById(userId);
+
+        if (optionalUser.isEmpty())
+            throw new NotFoundException(StatusDTO.builder().timestamp(new Date()).errorCode(404).errorMessage("Profile is not found!").build());
+
+        return profileMapper.toProfileDTO(optionalUser.get());
     }
 
     @Override
-    public User findByEmail(String email) {
-        return userRepository.findUserByEmail(email);
+    public User findByEmail(String email) throws NotFoundException {
+        Optional<User> optionalUser = userRepository.findUserByEmail(email);
+
+        if (optionalUser.isEmpty())
+            throw new NotFoundException(StatusDTO.builder().timestamp(new Date()).errorCode(404).errorMessage("User is not found!").build());
+
+        return optionalUser.get();
     }
 
     @Override
-    public UserDetails login(LoginRequestDTO request) {
+    public UserDetails login(LoginRequestDTO request) throws BadCredentialsException {
         UsernamePasswordAuthenticationToken authenticationTokenRequest = new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword());
 
-        try {
-            Authentication authentication = this.authenticationManager.authenticate(authenticationTokenRequest);
-            SecurityContext securityContext = SecurityContextHolder.getContext();
-            securityContext.setAuthentication(authentication);
+        Authentication authentication = this.authenticationManager.authenticate(authenticationTokenRequest);
+        SecurityContext securityContext = SecurityContextHolder.getContext();
+        securityContext.setAuthentication(authentication);
 
-            return (UserDetails) authentication.getPrincipal();
-
-        } catch (BadCredentialsException ex) {
-            return null;
-        }
+        return (UserDetails) authentication.getPrincipal();
     }
 
     @Override
@@ -101,7 +117,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Boolean register(SignUpRequestDTO request) {
+    public UserDTO register(SignUpRequestDTO request) throws AlreadyRegisteredEmailException {
         User user = new User();
         user.setCreatedAt(new Date());
         user.setEmail(request.getEmail());
@@ -109,11 +125,11 @@ public class UserServiceImpl implements UserService {
         user.setFirstName(request.getFirstName());
         user.setPassword(bCryptPasswordEncoder.encode(request.getPassword()));
 
-        try {
-            userRepository.save(user);
-            return true;
-        } catch (Exception e) {
-            return false;
-        }
+        Optional<User> optionalUser = userRepository.findUserByEmail(user.getEmail());
+
+        if (optionalUser.isEmpty())
+            throw new AlreadyRegisteredEmailException(StatusDTO.builder().timestamp(new Date()).errorCode(400).errorMessage("You have already registered with this email address!").build());
+
+        return userMapper.userToUserDTO(optionalUser.get());
     }
 }

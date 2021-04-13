@@ -2,9 +2,12 @@ package com.norbertgal.couchsurfersbe.controllers;
 
 import com.norbertgal.couchsurfersbe.api.v1.model.OwnReservationDTO;
 import com.norbertgal.couchsurfersbe.api.v1.model.OwnReservationPreviewListDTO;
+import com.norbertgal.couchsurfersbe.api.v1.model.exception.AlreadyBookedException;
+import com.norbertgal.couchsurfersbe.api.v1.model.exception.NotBookedException;
+import com.norbertgal.couchsurfersbe.api.v1.model.exception.NotFoundException;
+import com.norbertgal.couchsurfersbe.api.v1.model.exception.TooLateToCancelReservationException;
 import com.norbertgal.couchsurfersbe.api.v1.model.request.ReservationRequestDTO;
 import com.norbertgal.couchsurfersbe.services.ReservationService;
-import javassist.NotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -31,23 +34,21 @@ public class ReservationController {
     }
 
     @GetMapping(value = "/query/reservation")
-    public ResponseEntity<OwnReservationDTO> getOwnReservation(@RequestParam(name = "userid") Long userId, @RequestParam(name = "couchid") Long couchId) {
+    public ResponseEntity<OwnReservationDTO> getOwnReservation(@RequestParam(name = "userid") Long userId,
+                                                               @RequestParam(name = "couchid") Long couchId) throws NotFoundException {
         OwnReservationDTO ownReservation = reservationService.getOwnReservation(userId, couchId);
-        if (ownReservation != null)
-            return new ResponseEntity<>(ownReservation, HttpStatus.OK);
-        return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>(ownReservation, HttpStatus.OK);
     }
 
     @PostMapping(value = "/book")
-    public ResponseEntity<OwnReservationDTO> bookCouch(@RequestBody ReservationRequestDTO request) {
+    public ResponseEntity<OwnReservationDTO> bookCouch(@RequestBody ReservationRequestDTO request) throws NotFoundException, NotBookedException, AlreadyBookedException {
         OwnReservationDTO ownReservation = reservationService.bookCouch(request);
-        if (ownReservation != null)
-            return new ResponseEntity<>(ownReservation, HttpStatus.OK);
-        return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(ownReservation, HttpStatus.OK);
     }
 
     @DeleteMapping(value = "/cancel")
-    public ResponseEntity<HttpStatus> cancelReservation(@RequestParam(name = "userid") Long userId, @RequestParam(name = "couchid") Long couchId) throws NotFoundException {
+    public ResponseEntity<HttpStatus> cancelReservation(@RequestParam(name = "userid") Long userId,
+                                                        @RequestParam(name = "couchid") Long couchId) throws NotFoundException, TooLateToCancelReservationException {
         reservationService.cancelReservation(userId, couchId);
         return new ResponseEntity<>(HttpStatus.OK);
     }

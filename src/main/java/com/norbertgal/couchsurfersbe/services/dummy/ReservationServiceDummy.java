@@ -1,9 +1,11 @@
 package com.norbertgal.couchsurfersbe.services.dummy;
 
 import com.norbertgal.couchsurfersbe.api.v1.model.*;
+import com.norbertgal.couchsurfersbe.api.v1.model.exception.NotBookedException;
+import com.norbertgal.couchsurfersbe.api.v1.model.exception.NotFoundException;
+import com.norbertgal.couchsurfersbe.api.v1.model.exception.TooLateToCancelReservationException;
 import com.norbertgal.couchsurfersbe.api.v1.model.request.ReservationRequestDTO;
 import com.norbertgal.couchsurfersbe.services.ReservationService;
-import javassist.NotFoundException;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
@@ -24,17 +26,17 @@ public class ReservationServiceDummy implements ReservationService {
     }
 
     @Override
-    public OwnReservationDTO getOwnReservation(Long userId, Long couchId) {
+    public OwnReservationDTO getOwnReservation(Long userId, Long couchId) throws NotFoundException {
         return null;
     }
 
     @Override
-    public OwnReservationDTO bookCouch(ReservationRequestDTO reservationRequestDTO) {
+    public OwnReservationDTO bookCouch(ReservationRequestDTO reservationRequestDTO) throws NotFoundException, NotBookedException {
         return null;
     }
 
     @Override
-    public void cancelReservation(Long userId, Long couchId) throws NotFoundException {
+    public void cancelReservation(Long userId, Long couchId) throws NotFoundException, TooLateToCancelReservationException {
 
     }
 
