@@ -4,12 +4,14 @@ import com.norbertgal.couchsurfersbe.api.v1.mapper.OwnReservationMapper;
 import com.norbertgal.couchsurfersbe.api.v1.mapper.OwnReservationPreviewMapper;
 import com.norbertgal.couchsurfersbe.api.v1.model.OwnReservationDTO;
 import com.norbertgal.couchsurfersbe.api.v1.model.OwnReservationPreviewDTO;
+import com.norbertgal.couchsurfersbe.domain.Reservation;
 import com.norbertgal.couchsurfersbe.repositories.ReservationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Profile("dev")
@@ -45,6 +47,7 @@ public class ReservationServiceImpl implements ReservationService {
 
     @Override
     public OwnReservationDTO getOwnReservation(Long userId, Long couchId) {
-        return ownReservationMapper.toOwnReservationDTO(reservationRepository.findByUserIdAndCouchId(userId, couchId));
+        Optional<Reservation> optionalReservation = reservationRepository.findByUserIdAndCouchId(userId, couchId);
+        return optionalReservation.map(ownReservationMapper::toOwnReservationDTO).orElse(null);
     }
 }

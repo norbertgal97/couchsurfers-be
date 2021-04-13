@@ -1,5 +1,6 @@
 package com.norbertgal.couchsurfersbe.services.authentication;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.norbertgal.couchsurfersbe.domain.User;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -19,6 +20,11 @@ public class UserDetailsImpl implements UserDetails {
         return new HashSet<>();
     }
 
+    public long getUserId() {
+        return user.getId();
+    }
+
+    @JsonIgnore
     @Override
     public String getPassword() {
         return user.getPassword();
