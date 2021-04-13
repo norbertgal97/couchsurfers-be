@@ -15,7 +15,7 @@ import java.util.Date;
 public class Reservation {
 
     @EmbeddedId
-    private ReservationId id;
+    private ReservationId id = new ReservationId();
 
     @ManyToOne(fetch = FetchType.LAZY)
     @MapsId("userId")
@@ -28,9 +28,11 @@ public class Reservation {
     @Column(name = "number_of_guests")
     private int numberOfGuests;
 
+    @Temporal(TemporalType.DATE)
     @Column(name = "start_date")
     private Date startDate;
 
+    @Temporal(TemporalType.DATE)
     @Column(name = "end_date")
     private Date endDate;
 
