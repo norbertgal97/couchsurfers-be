@@ -127,9 +127,10 @@ public class UserServiceImpl implements UserService {
 
         Optional<User> optionalUser = userRepository.findUserByEmail(user.getEmail());
 
-        if (optionalUser.isEmpty())
+        if (optionalUser.isPresent())
             throw new AlreadyRegisteredEmailException(StatusDTO.builder().timestamp(new Date()).errorCode(400).errorMessage("You have already registered with this email address!").build());
 
-        return userMapper.userToUserDTO(optionalUser.get());
+        User registeredUser = userRepository.save(user);
+        return userMapper.userToUserDTO(registeredUser);
     }
 }
