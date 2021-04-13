@@ -1,7 +1,9 @@
 package com.norbertgal.couchsurfersbe.services.dummy;
 
 import com.norbertgal.couchsurfersbe.api.v1.model.*;
+import com.norbertgal.couchsurfersbe.api.v1.model.request.ReservationRequestDTO;
 import com.norbertgal.couchsurfersbe.services.ReservationService;
+import javassist.NotFoundException;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
@@ -24,6 +26,16 @@ public class ReservationServiceDummy implements ReservationService {
     @Override
     public OwnReservationDTO getOwnReservation(Long userId, Long couchId) {
         return null;
+    }
+
+    @Override
+    public OwnReservationDTO bookCouch(ReservationRequestDTO reservationRequestDTO) {
+        return null;
+    }
+
+    @Override
+    public void cancelReservation(Long userId, Long couchId) throws NotFoundException {
+
     }
 
     private List<OwnReservationPreviewDTO> getOwnReservationDTOs() {
