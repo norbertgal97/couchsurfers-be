@@ -2,12 +2,16 @@ package com.norbertgal.couchsurfersbe.controllers;
 
 import com.norbertgal.couchsurfersbe.api.v1.model.PersonalInformationDTO;
 import com.norbertgal.couchsurfersbe.api.v1.model.ProfileDTO;
+import com.norbertgal.couchsurfersbe.api.v1.model.UserDTO;
+import com.norbertgal.couchsurfersbe.api.v1.model.exception.AlreadyRegisteredEmailException;
+import com.norbertgal.couchsurfersbe.api.v1.model.exception.NotFoundException;
 import com.norbertgal.couchsurfersbe.api.v1.model.request.LoginRequestDTO;
 import com.norbertgal.couchsurfersbe.api.v1.model.request.SignUpRequestDTO;
 import com.norbertgal.couchsurfersbe.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,19 +28,15 @@ public class UserController {
     }
 
     @PostMapping(value = "/session/login")
-    public ResponseEntity<UserDetails> login(@RequestBody LoginRequestDTO request) {
+    public ResponseEntity<UserDetails> login(@RequestBody LoginRequestDTO request) throws BadCredentialsException {
         UserDetails userDetails = userService.login(request);
-        if (userDetails != null)
-            return new ResponseEntity<>(userDetails, HttpStatus.OK);
-        return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(userDetails, HttpStatus.OK);
     }
 
     @PostMapping(value = "/session/register")
-    public ResponseEntity<Boolean> register(@RequestBody SignUpRequestDTO request) {
-        Boolean response = userService.register(request);
-        if (response)
-            return new ResponseEntity<>(true, HttpStatus.CREATED);
-        return new ResponseEntity<>(false, HttpStatus.BAD_REQUEST);
+    public ResponseEntity<UserDTO> register(@RequestBody SignUpRequestDTO request) throws AlreadyRegisteredEmailException {
+        UserDTO userDTO = userService.register(request);
+        return new ResponseEntity<>(userDTO, HttpStatus.CREATED);
     }
 
     @GetMapping(value = "/session/logout")
@@ -46,19 +46,15 @@ public class UserController {
     }
 
     @GetMapping(value = "/query/personalinformation")
-    public ResponseEntity<PersonalInformationDTO> getPersonalInformation(@RequestParam(name = "userid") Long userId) {
+    public ResponseEntity<PersonalInformationDTO> getPersonalInformation(@RequestParam(name = "userid") Long userId) throws NotFoundException {
         PersonalInformationDTO personalInformation = userService.getPersonalInformation(userId);
-        if (personalInformation != null)
-            return new ResponseEntity<>(personalInformation, HttpStatus.OK);
-        return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>(personalInformation, HttpStatus.OK);
     }
 
     @GetMapping(value = "/query/profile")
-    public ResponseEntity<ProfileDTO> getProfile(@RequestParam(name = "userid") Long userId) {
+    public ResponseEntity<ProfileDTO> getProfile(@RequestParam(name = "userid") Long userId) throws NotFoundException {
         ProfileDTO profile = userService.getProfile(userId);
-        if (profile != null)
-            return new ResponseEntity<>(profile, HttpStatus.OK);
-        return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>(profile, HttpStatus.OK);
     }
 
 }

@@ -4,6 +4,11 @@ import com.norbertgal.couchsurfersbe.api.v1.mapper.OwnReservationMapper;
 import com.norbertgal.couchsurfersbe.api.v1.mapper.OwnReservationPreviewMapper;
 import com.norbertgal.couchsurfersbe.api.v1.model.OwnReservationDTO;
 import com.norbertgal.couchsurfersbe.api.v1.model.OwnReservationPreviewDTO;
+import com.norbertgal.couchsurfersbe.api.v1.model.StatusDTO;
+import com.norbertgal.couchsurfersbe.api.v1.model.exception.AlreadyBookedException;
+import com.norbertgal.couchsurfersbe.api.v1.model.exception.NotBookedException;
+import com.norbertgal.couchsurfersbe.api.v1.model.exception.NotFoundException;
+import com.norbertgal.couchsurfersbe.api.v1.model.exception.TooLateToCancelReservationException;
 import com.norbertgal.couchsurfersbe.api.v1.model.request.ReservationRequestDTO;
 import com.norbertgal.couchsurfersbe.domain.Couch;
 import com.norbertgal.couchsurfersbe.domain.Reservation;
@@ -11,7 +16,6 @@ import com.norbertgal.couchsurfersbe.domain.User;
 import com.norbertgal.couchsurfersbe.repositories.CouchRepository;
 import com.norbertgal.couchsurfersbe.repositories.ReservationRepository;
 import com.norbertgal.couchsurfersbe.repositories.UserRepository;
-import javassist.NotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
@@ -60,52 +64,65 @@ public class ReservationServiceImpl implements ReservationService {
     }
 
     @Override
-    public OwnReservationDTO getOwnReservation(Long userId, Long couchId) {
+    public OwnReservationDTO getOwnReservation(Long userId, Long couchId) throws NotFoundException {
         Optional<Reservation> optionalReservation = reservationRepository.findByUserIdAndCouchId(userId, couchId);
-        return optionalReservation.map(ownReservationMapper::toOwnReservationDTO).orElse(null);
+
+        if (optionalReservation.isEmpty())
+            throw new NotFoundException(StatusDTO.builder().timestamp(new Date()).errorCode(404).errorMessage("Reservation is not found!").build());
+
+        return ownReservationMapper.toOwnReservationDTO(optionalReservation.get());
     }
 
     @Override
-    public OwnReservationDTO bookCouch(ReservationRequestDTO reservationRequestDTO) {
+    public OwnReservationDTO bookCouch(ReservationRequestDTO reservationRequestDTO) throws NotFoundException, NotBookedException, AlreadyBookedException {
         Optional<User> optionalUser = userRepository.findById(reservationRequestDTO.getUserId());
         Optional<Couch> optionalCouch = couchRepository.findById(reservationRequestDTO.getCouchId());
 
-        if (optionalCouch.isPresent() && optionalUser.isPresent()) {
-            User user = optionalUser.get();
-            Couch couch = optionalCouch.get();
+        if (optionalCouch.isEmpty())
+            throw new NotFoundException(StatusDTO.builder().timestamp(new Date()).errorCode(404).errorMessage("Couch is not found!").build());
 
-            Reservation reservation = new Reservation();
-            reservation.setCouch(couch);
-            reservation.setUser(user);
-            reservation.setStartDate(reservationRequestDTO.getStartDate());
-            reservation.setEndDate(reservationRequestDTO.getEndDate());
-            reservation.setNumberOfGuests(reservationRequestDTO.getNumberOfGuests());
+        if (optionalUser.isEmpty())
+            throw new NotFoundException(StatusDTO.builder().timestamp(new Date()).errorCode(404).errorMessage("User is not found!").build());
 
-            user.getReservations().add(reservation);
+        User user = optionalUser.get();
+        Couch couch = optionalCouch.get();
 
-            try {
-                userRepository.save(user);
-                Optional<Reservation> optionalReservation = reservationRepository.findByUserIdAndCouchId(user.getId(), couch.getId());
-                return optionalReservation.map(ownReservationMapper::toOwnReservationDTO).orElse(null);
-            } catch (Exception e) {
-                return null;
-            }
-        }
+        Optional<Reservation> optionalReservation = reservationRepository.findByUserIdAndCouchId(user.getId(), couch.getId());
+        if (optionalReservation.isPresent())
+            throw new AlreadyBookedException(StatusDTO.builder().timestamp(new Date()).errorCode(400).errorMessage("You have already booked this accommodation!").build());
 
-        return null;
+        Reservation reservation = new Reservation();
+        reservation.setCouch(couch);
+        reservation.setUser(user);
+        reservation.setStartDate(reservationRequestDTO.getStartDate());
+        reservation.setEndDate(reservationRequestDTO.getEndDate());
+        reservation.setNumberOfGuests(reservationRequestDTO.getNumberOfGuests());
+
+        user.getReservations().add(reservation);
+
+        userRepository.save(user);
+
+        optionalReservation = reservationRepository.findByUserIdAndCouchId(user.getId(), couch.getId());
+        if (optionalReservation.isEmpty())
+            throw new NotBookedException(StatusDTO.builder().timestamp(new Date()).errorCode(400).errorMessage("The accommodation could not be booked!").build());
+
+        return ownReservationMapper.toOwnReservationDTO(optionalReservation.get());
     }
 
     @Override
-    public void cancelReservation(Long userId, Long couchId) throws NotFoundException {
+    public void cancelReservation(Long userId, Long couchId) throws NotFoundException, TooLateToCancelReservationException {
         Optional<Reservation> optionalReservation = reservationRepository.findByUserIdAndCouchId(userId, couchId);
         if (optionalReservation.isPresent()) {
             Reservation reservation = optionalReservation.get();
 
             long diff = reservation.getStartDate().getTime() - new Date().getTime();
-            if (TimeUnit.DAYS.convert(diff, TimeUnit.MILLISECONDS) >= 15)
+            if (TimeUnit.DAYS.convert(diff, TimeUnit.MILLISECONDS) >= 15) {
                 reservationRepository.delete(reservation);
+            } else {
+                throw new TooLateToCancelReservationException(StatusDTO.builder().timestamp(new Date()).errorCode(400).errorMessage("It is too late to cancel reservation!").build());
+            }
         } else {
-            throw new NotFoundException("Reservation is not found!");
+            throw new NotFoundException(StatusDTO.builder().timestamp(new Date()).errorCode(404).errorMessage("Reservation is not found!").build());
         }
     }
 
