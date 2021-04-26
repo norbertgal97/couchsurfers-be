@@ -5,10 +5,7 @@ import com.norbertgal.couchsurfersbe.api.v1.mapper.OwnReservationPreviewMapper;
 import com.norbertgal.couchsurfersbe.api.v1.model.OwnReservationDTO;
 import com.norbertgal.couchsurfersbe.api.v1.model.OwnReservationPreviewDTO;
 import com.norbertgal.couchsurfersbe.api.v1.model.StatusDTO;
-import com.norbertgal.couchsurfersbe.api.v1.model.exception.AlreadyBookedException;
-import com.norbertgal.couchsurfersbe.api.v1.model.exception.NotBookedException;
-import com.norbertgal.couchsurfersbe.api.v1.model.exception.NotFoundException;
-import com.norbertgal.couchsurfersbe.api.v1.model.exception.TooLateToCancelReservationException;
+import com.norbertgal.couchsurfersbe.api.v1.model.exception.*;
 import com.norbertgal.couchsurfersbe.api.v1.model.request.ReservationRequestDTO;
 import com.norbertgal.couchsurfersbe.domain.Couch;
 import com.norbertgal.couchsurfersbe.domain.Reservation;
@@ -20,6 +17,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -74,7 +73,7 @@ public class ReservationServiceImpl implements ReservationService {
     }
 
     @Override
-    public OwnReservationDTO bookCouch(ReservationRequestDTO reservationRequestDTO) throws NotFoundException, NotBookedException, AlreadyBookedException {
+    public OwnReservationDTO bookCouch(ReservationRequestDTO reservationRequestDTO) throws NotFoundException, NotBookedException, AlreadyBookedException, NotEnoughFreeSpaceException {
         Optional<User> optionalUser = userRepository.findById(reservationRequestDTO.getUserId());
         Optional<Couch> optionalCouch = couchRepository.findById(reservationRequestDTO.getCouchId());
 
@@ -90,6 +89,16 @@ public class ReservationServiceImpl implements ReservationService {
         Optional<Reservation> optionalReservation = reservationRepository.findByUserIdAndCouchId(user.getId(), couch.getId());
         if (optionalReservation.isPresent())
             throw new AlreadyBookedException(StatusDTO.builder().timestamp(new Date()).errorCode(400).errorMessage("You have already booked this accommodation!").build());
+
+        LocalDate startLocalDate = reservationRequestDTO.getStartDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+        LocalDate endLocalDate = reservationRequestDTO.getEndDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+
+        for (LocalDate current = startLocalDate; !current.isAfter(endLocalDate); current = current.plusDays(1)) {
+            int numberOfGuestsOnSpecificDate = reservationRepository.queryNumberOfGuestsOnSpecificDate(couch.getId(), Date.from(current.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant()));
+
+            if (couch.getNumberOfGuests() - numberOfGuestsOnSpecificDate < reservationRequestDTO.getNumberOfGuests())
+                throw new NotEnoughFreeSpaceException(StatusDTO.builder().timestamp(new Date()).errorCode(400).errorMessage("Could not reserve enough space for guests").build());
+        }
 
         Reservation reservation = new Reservation();
         reservation.setCouch(couch);
