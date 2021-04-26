@@ -2,10 +2,7 @@ package com.norbertgal.couchsurfersbe.controllers;
 
 import com.norbertgal.couchsurfersbe.api.v1.model.OwnReservationDTO;
 import com.norbertgal.couchsurfersbe.api.v1.model.OwnReservationPreviewListDTO;
-import com.norbertgal.couchsurfersbe.api.v1.model.exception.AlreadyBookedException;
-import com.norbertgal.couchsurfersbe.api.v1.model.exception.NotBookedException;
-import com.norbertgal.couchsurfersbe.api.v1.model.exception.NotFoundException;
-import com.norbertgal.couchsurfersbe.api.v1.model.exception.TooLateToCancelReservationException;
+import com.norbertgal.couchsurfersbe.api.v1.model.exception.*;
 import com.norbertgal.couchsurfersbe.api.v1.model.request.ReservationRequestDTO;
 import com.norbertgal.couchsurfersbe.services.ReservationService;
 import org.springframework.http.HttpStatus;
@@ -41,7 +38,7 @@ public class ReservationController {
     }
 
     @PostMapping(value = "/book")
-    public ResponseEntity<OwnReservationDTO> bookCouch(@RequestBody ReservationRequestDTO request) throws NotFoundException, NotBookedException, AlreadyBookedException {
+    public ResponseEntity<OwnReservationDTO> bookCouch(@RequestBody ReservationRequestDTO request) throws NotFoundException, NotBookedException, AlreadyBookedException, NotEnoughFreeSpaceException {
         OwnReservationDTO ownReservation = reservationService.bookCouch(request);
         return new ResponseEntity<>(ownReservation, HttpStatus.OK);
     }

@@ -43,4 +43,9 @@ public class ExceptionHelper {
         return new ResponseEntity<>(ex.getStatus(), HttpStatus.BAD_REQUEST);
     }
 
+    @ExceptionHandler(value = {NotEnoughFreeSpaceException.class})
+    public ResponseEntity<StatusDTO> handleNotEnoughFreeSpaceException(NotEnoughFreeSpaceException ex) {
+        return new ResponseEntity<>(ex.getStatus(), HttpStatus.BAD_REQUEST);
+    }
+
 }
