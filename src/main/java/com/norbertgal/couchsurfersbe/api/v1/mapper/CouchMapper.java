@@ -5,7 +5,7 @@ import com.norbertgal.couchsurfersbe.domain.Couch;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 
-@Mapper(uses = CouchPhotoMapper.class)
+@Mapper(componentModel = "spring", uses = CouchPhotoMapper.class)
 public interface CouchMapper {
     CouchMapper INSTANCE = Mappers.getMapper(CouchMapper.class);
 

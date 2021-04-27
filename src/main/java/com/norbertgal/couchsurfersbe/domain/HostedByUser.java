@@ -13,7 +13,7 @@ import javax.persistence.*;
 @Table(name = "hosted_by_user")
 public class HostedByUser {
     @EmbeddedId
-    private HostedByUserId id;
+    private HostedByUserId id = new HostedByUserId();
 
     @ManyToOne(fetch = FetchType.LAZY)
     @MapsId("userId")
