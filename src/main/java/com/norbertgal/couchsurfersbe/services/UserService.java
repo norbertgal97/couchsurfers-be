@@ -1,5 +1,6 @@
 package com.norbertgal.couchsurfersbe.services;
 
+import com.norbertgal.couchsurfersbe.api.v1.model.LogoutDTO;
 import com.norbertgal.couchsurfersbe.api.v1.model.PersonalInformationDTO;
 import com.norbertgal.couchsurfersbe.api.v1.model.ProfileDTO;
 import com.norbertgal.couchsurfersbe.api.v1.model.UserDTO;
@@ -20,7 +21,7 @@ public interface UserService {
 
     UserDetails login(LoginRequestDTO request) throws BadCredentialsException;
 
-    Boolean logout();
+    LogoutDTO logout();
 
     UserDTO register(SignUpRequestDTO request) throws AlreadyRegisteredEmailException;
 }

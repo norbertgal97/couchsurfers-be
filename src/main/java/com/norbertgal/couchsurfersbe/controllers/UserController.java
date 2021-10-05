@@ -1,5 +1,6 @@
 package com.norbertgal.couchsurfersbe.controllers;
 
+import com.norbertgal.couchsurfersbe.api.v1.model.LogoutDTO;
 import com.norbertgal.couchsurfersbe.api.v1.model.PersonalInformationDTO;
 import com.norbertgal.couchsurfersbe.api.v1.model.ProfileDTO;
 import com.norbertgal.couchsurfersbe.api.v1.model.UserDTO;
@@ -39,10 +40,11 @@ public class UserController {
         return new ResponseEntity<>(userDTO, HttpStatus.CREATED);
     }
 
-    @GetMapping(value = "/session/logout")
+    @PostMapping(value = "/session/logout")
     @ResponseStatus(HttpStatus.OK)
-    public Boolean logout() {
-        return userService.logout();
+    public ResponseEntity<LogoutDTO> logout() {
+        LogoutDTO logoutDTO = userService.logout();
+        return new ResponseEntity<>(logoutDTO, HttpStatus.OK);
     }
 
     @GetMapping(value = "/query/personalinformation")

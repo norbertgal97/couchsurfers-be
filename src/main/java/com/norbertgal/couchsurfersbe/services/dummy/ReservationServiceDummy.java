@@ -58,20 +58,20 @@ public class ReservationServiceDummy implements ReservationService {
         locationDTO.setBuildingNumber("79/a");
         locationDTO.setCity("London");
         locationDTO.setStreet("Arodene Rd");
-        locationDTO.setZipCode(1223);
+        locationDTO.setZipCode("1223");
         couchDTO.setLocation(locationDTO);
 
-        List<CouchPhotoDTO> couchPhotoDTOs = new ArrayList<>();
+        /*List<CouchPhotoDTO> couchPhotoDTOs = new ArrayList<>();
         CouchPhotoDTO couchPhotoDTO = new CouchPhotoDTO();
         couchPhotoDTO.setPhoto("asd12312141r152".getBytes());
         couchPhotoDTOs.add(couchPhotoDTO);
         couchDTO.setCouchPhotos(couchPhotoDTOs);
-        couchDTO.getCouchPhotos().add(couchPhotoDTO);
+        couchDTO.getCouchPhotos().add(couchPhotoDTO);*/
 
         reservation.setEndDate(new GregorianCalendar(2021, Calendar.FEBRUARY, 15).getTime());
         reservation.setStartDate(new GregorianCalendar(2021, Calendar.FEBRUARY, 11).getTime());
         reservation.setAmenities(couchDTO.getAmenities());
-        reservation.setCouchPhoto(couchPhotoDTO);
+        //reservation.setCouchPhoto(couchPhotoDTO);
         reservation.setLocation(couchDTO.getLocation());
         reservation.setRating(4.3);
 

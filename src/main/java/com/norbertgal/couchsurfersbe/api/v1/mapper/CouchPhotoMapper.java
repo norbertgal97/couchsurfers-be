@@ -8,7 +8,9 @@ import org.mapstruct.Mappings;
 import org.mapstruct.Named;
 import org.mapstruct.factory.Mappers;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 @Mapper(componentModel = "spring")
 public interface CouchPhotoMapper {
@@ -21,8 +23,24 @@ public interface CouchPhotoMapper {
     })
     CouchPhotoDTO toCouchPhotoDTO(CouchPhoto couchPhoto);
 
+    @Named("ids")
+    default List<Long> toCouchPhotoIds(List<CouchPhoto> couchPhotos) {
+        List<Long> longList = new ArrayList<>();
+
+        for(CouchPhoto couchPhoto : couchPhotos) {
+            longList.add(couchPhoto.getId());
+        }
+
+        return longList;
+    }
+
     @Named("firstElement")
-    default CouchPhotoDTO listToCouchPhotoDTO(List<CouchPhoto> couchPhotos) {
-        return couchPhotos.isEmpty() ? new CouchPhotoDTO() : new CouchPhotoDTO(couchPhotos.get(0).getPhoto());
+    default Long listToCouchPhotoDTO(List<CouchPhoto> couchPhotos) {
+        if (couchPhotos.isEmpty()) {
+            return null;
+        } else {
+            Random random = new Random();
+            return couchPhotos.get(random.nextInt(couchPhotos.size())).getId();
+        }
     }
 }

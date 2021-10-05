@@ -1,7 +1,7 @@
 package com.norbertgal.couchsurfersbe.api.v1.mapper;
 
 import com.norbertgal.couchsurfersbe.api.v1.model.OwnHostedCouchDTO;
-import com.norbertgal.couchsurfersbe.domain.HostedByUser;
+import com.norbertgal.couchsurfersbe.domain.Couch;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Mappings;
@@ -10,11 +10,11 @@ import org.mapstruct.Mappings;
 public interface OwnHostedCouchMapper {
 
     @Mappings({
-            @Mapping(target = "couchPhoto", source = "hostedByUser.couch.couchPhotos", qualifiedByName = "firstElement"),
-            @Mapping(target = "about", source = "hostedByUser.couch.about"),
-            @Mapping(target = "amenities", source = "hostedByUser.couch.amenities"),
-            @Mapping(target = "couchId", source = "hostedByUser.couch.id"),
-            @Mapping(target = "userId", source = "hostedByUser.user.id")
+            @Mapping(target = "couchPhotoId", source = "couch.couchPhotos", qualifiedByName = "firstElement"),
+            @Mapping(target = "about", source = "couch.about"),
+            @Mapping(target = "name", source = "couch.name"),
+            @Mapping(target = "couchId", source = "couch.id"),
+            @Mapping(target = "hosted", source = "couch.hosted")
     })
-    OwnHostedCouchDTO toOwnHostedCouchDTO(HostedByUser hostedByUser);
+    OwnHostedCouchDTO toOwnHostedCouchDTO(Couch couch);
 }

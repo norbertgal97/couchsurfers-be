@@ -24,8 +24,8 @@ public class OwnReservationPreviewDTO {
     @JsonProperty("end_date")
     private Date endDate;
 
-    @JsonProperty("couch_photo")
-    private CouchPhotoDTO couchPhoto;
+    @JsonProperty("couch_photo_id")
+    private Long couchPhotoId;
 
     private LocationDTO location;
 

@@ -1,5 +1,6 @@
 package com.norbertgal.couchsurfersbe.domain;
 
+import com.sun.istack.NotNull;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.hibernate.annotations.CreationTimestamp;
@@ -10,28 +11,40 @@ import java.util.Date;
 import java.util.List;
 
 @Data
-@EqualsAndHashCode(callSuper = true)
+@EqualsAndHashCode
 @Entity
 @Table(name = "couch")
-public class Couch extends BaseEntity {
+public class Couch {
 
+    @Id
+    @Column(name = "host_id")
+    private Long id;
+
+    @NotNull
     @Column(name = "name")
     private String name;
 
+    @NotNull
     @Column(name = "number_of_guests")
-    private int numberOfGuests;
+    private Integer numberOfGuests;
 
+    @NotNull
     @Column(name = "number_of_rooms")
-    private int numberOfRooms;
+    private Integer numberOfRooms;
 
-    @Column(name = "about")
+    @Column(name = "about", length = 1000)
     private String about;
 
     @Column(name = "amenities")
     private String amenities;
 
+    @NotNull
     @Column(name = "price")
     private Double price;
+
+    @NotNull
+    @Column(name = "hosted")
+    private Boolean hosted;
 
     @Embedded
     private Location location;
@@ -54,14 +67,12 @@ public class Couch extends BaseEntity {
     )
     private List<Review> reviews = new ArrayList<>();
 
-    @OneToOne(
-            mappedBy = "couch",
-            cascade = CascadeType.ALL,
-            orphanRemoval = true
-    )
-    private HostedByUser hostedByUser;
+    @OneToOne
+    @MapsId
+    @JoinColumn(name = "host_id")
+    private User user;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "couch", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<CouchPhoto> couchPhotos = new ArrayList<>();
 
 }

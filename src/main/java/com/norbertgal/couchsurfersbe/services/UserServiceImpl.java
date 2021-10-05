@@ -3,10 +3,7 @@ package com.norbertgal.couchsurfersbe.services;
 import com.norbertgal.couchsurfersbe.api.v1.mapper.PersonalInformationMapper;
 import com.norbertgal.couchsurfersbe.api.v1.mapper.ProfileMapper;
 import com.norbertgal.couchsurfersbe.api.v1.mapper.UserMapper;
-import com.norbertgal.couchsurfersbe.api.v1.model.PersonalInformationDTO;
-import com.norbertgal.couchsurfersbe.api.v1.model.ProfileDTO;
-import com.norbertgal.couchsurfersbe.api.v1.model.StatusDTO;
-import com.norbertgal.couchsurfersbe.api.v1.model.UserDTO;
+import com.norbertgal.couchsurfersbe.api.v1.model.*;
 import com.norbertgal.couchsurfersbe.api.v1.model.exception.AlreadyRegisteredEmailException;
 import com.norbertgal.couchsurfersbe.api.v1.model.exception.NotFoundException;
 import com.norbertgal.couchsurfersbe.api.v1.model.request.LoginRequestDTO;
@@ -105,7 +102,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Boolean logout() {
+    public LogoutDTO logout() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication != null) {
             new SecurityContextLogoutHandler().logout(
@@ -113,7 +110,7 @@ public class UserServiceImpl implements UserService {
                     httpServletResponse,
                     authentication);
         }
-        return true;
+        return new LogoutDTO("Logged out!");
     }
 
     @Override
@@ -121,14 +118,13 @@ public class UserServiceImpl implements UserService {
         User user = new User();
         user.setCreatedAt(new Date());
         user.setEmail(request.getEmail());
-        user.setLastName(request.getLastName());
-        user.setFirstName(request.getFirstName());
+        user.setFullName(request.getFullName());
         user.setPassword(bCryptPasswordEncoder.encode(request.getPassword()));
 
         Optional<User> optionalUser = userRepository.findUserByEmail(user.getEmail());
 
         if (optionalUser.isPresent())
-            throw new AlreadyRegisteredEmailException(StatusDTO.builder().timestamp(new Date()).errorCode(400).errorMessage("You have already registered with this email address!").build());
+            throw new AlreadyRegisteredEmailException(StatusDTO.builder().timestamp(new Date()).errorCode(409).errorMessage("You have already registered with this email address!").build());
 
         User registeredUser = userRepository.save(user);
         return userMapper.userToUserDTO(registeredUser);

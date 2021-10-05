@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 public class LocationDTO {
 
     @JsonProperty("zip_code")
-    private int zipCode;
+    private String zipCode;
 
     private String city;
 
@@ -19,5 +19,32 @@ public class LocationDTO {
 
     @JsonProperty("building_number")
     private String buildingNumber;
+
+    public enum CodingKeys {
+        zipCode("zip_code"),
+        city("city"),
+        street("street"),
+        buildingNumber("building_number");
+
+        private final String jsonProperty;
+
+        CodingKeys(String jsonProperty) {
+            this.jsonProperty = jsonProperty;
+        }
+
+        public String getJsonProperty() {
+            return this.jsonProperty;
+        }
+
+        public static LocationDTO.CodingKeys fromJsonProperty(String jsonProperty) {
+            for (LocationDTO.CodingKeys k : LocationDTO.CodingKeys.values()) {
+                if (k.jsonProperty.equalsIgnoreCase(jsonProperty)) {
+                    return k;
+                }
+            }
+            throw new IllegalArgumentException("No constant with jsonProperty " + jsonProperty + " found");
+        }
+
+    }
 
 }

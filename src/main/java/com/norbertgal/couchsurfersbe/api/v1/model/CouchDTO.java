@@ -17,10 +17,10 @@ public class CouchDTO {
     private String name;
 
     @JsonProperty("number_of_guests")
-    private int numberOfGuests;
+    private Integer numberOfGuests;
 
     @JsonProperty("number_of_rooms")
-    private int numberOfRooms;
+    private Integer numberOfRooms;
 
     private String about;
 
@@ -30,7 +30,37 @@ public class CouchDTO {
 
     private LocationDTO location;
 
-    @JsonProperty("couch_photos")
-    private List<CouchPhotoDTO> couchPhotos;
+    @JsonProperty("couch_photo_ids")
+    private List<Long> couchPhotoIds;
 
+    public enum CodingKeys {
+        id("id"),
+        name("name"),
+        numberOfGuests("number_of_guests"),
+        numberOfRooms("number_of_rooms"),
+        about("about"),
+        amenities("amenities"),
+        price("price"),
+        location("location");
+
+        private final String jsonProperty;
+
+        CodingKeys(String jsonProperty) {
+            this.jsonProperty = jsonProperty;
+        }
+
+        public String getJsonProperty() {
+            return this.jsonProperty;
+        }
+
+        public static CodingKeys fromJsonProperty(String jsonProperty) {
+            for (CodingKeys k : CodingKeys.values()) {
+                if (k.jsonProperty.equalsIgnoreCase(jsonProperty)) {
+                    return k;
+                }
+            }
+            throw new IllegalArgumentException("No constant with jsonProperty " + jsonProperty + " found");
+        }
+
+    }
 }

@@ -1,5 +1,6 @@
 package com.norbertgal.couchsurfersbe.domain;
 
+import com.sun.istack.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -16,8 +17,9 @@ import javax.persistence.Embeddable;
 public class Location {
 
     @Column(name = "zip_code")
-    private int zipCode;
+    private String zipCode;
 
+    @NotNull
     @Column(name = "city")
     private String city;
 

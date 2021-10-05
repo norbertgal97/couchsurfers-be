@@ -16,9 +16,7 @@ public class SignUpRequestDTO {
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;
 
-    @JsonProperty("first_name")
-    private String firstName;
+    @JsonProperty("full_name")
+    private String fullName;
 
-    @JsonProperty("last_name")
-    private String lastName;
 }

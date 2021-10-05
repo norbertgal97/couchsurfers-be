@@ -1,12 +1,16 @@
 package com.norbertgal.couchsurfersbe.controllers;
 
-import com.norbertgal.couchsurfersbe.api.v1.model.CouchDTO;
-import com.norbertgal.couchsurfersbe.api.v1.model.OwnHostedCouchListDTO;
+import com.norbertgal.couchsurfersbe.api.v1.model.HostDTO;
+import com.norbertgal.couchsurfersbe.api.v1.model.OwnHostedCouchDTO;
+import com.norbertgal.couchsurfersbe.api.v1.model.exception.EmptyFieldsException;
 import com.norbertgal.couchsurfersbe.api.v1.model.exception.NotFoundException;
-import com.norbertgal.couchsurfersbe.api.v1.model.request.HostRequestDTO;
+import com.norbertgal.couchsurfersbe.api.v1.model.exception.UnknownUserException;
+import com.norbertgal.couchsurfersbe.api.v1.model.exception.WrongIdentifierException;
 import com.norbertgal.couchsurfersbe.services.HostService;
+import com.norbertgal.couchsurfersbe.services.authentication.UserDetailsImpl;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -20,14 +24,16 @@ public class HostController {
         this.hostService = hostService;
     }
 
-    @GetMapping(value = "/query/host")
-    public ResponseEntity<OwnHostedCouchListDTO> getOwnHostedCouches(@RequestParam(name = "userId") Long userId) {
-        return new ResponseEntity<>(new OwnHostedCouchListDTO(hostService.getOwnHostedCouches(userId)), HttpStatus.OK);
+    @GetMapping(value = "/own")
+    public ResponseEntity<OwnHostedCouchDTO> getOwnHostedCouch(@AuthenticationPrincipal UserDetailsImpl userDetails) throws UnknownUserException, NotFoundException {
+        return new ResponseEntity<>(hostService.getOwnHostedCouch(userDetails.getUserId()), HttpStatus.OK);
     }
 
-    @PostMapping(value = "/host")
-    public ResponseEntity<CouchDTO> hostCouch(@RequestBody HostRequestDTO request) throws NotFoundException {
-        return new ResponseEntity<>(hostService.hostCouch(request.getUserId(), request.getCouchId()), HttpStatus.OK);
+    @PatchMapping(value = "/{id}")
+    public ResponseEntity<HostDTO> hostCouch(@PathVariable("id") Long id, @RequestBody HostDTO request, @AuthenticationPrincipal UserDetailsImpl userDetails) throws NotFoundException, EmptyFieldsException, WrongIdentifierException, UnknownUserException {
+        return new ResponseEntity<>(hostService.hostCouch(userDetails.getUserId(), id, request), HttpStatus.OK);
     }
 
+    //      hosts get
+    //      hosts?city=valami
 }

@@ -18,11 +18,8 @@ import java.util.Set;
 @Table(name = "user")
 public class User extends BaseEntity {
 
-    @Column(name = "first_name")
-    private String firstName;
-
-    @Column(name = "last_name")
-    private String lastName;
+    @Column(name = "full_name")
+    private String fullName;
 
     @Column(name = "nickname")
     private String nickname;
@@ -76,12 +73,9 @@ public class User extends BaseEntity {
     )
     private List<Review> reviews = new ArrayList<>();
 
-    @OneToMany(
-            mappedBy = "user",
-            cascade = CascadeType.ALL,
-            orphanRemoval = true
-    )
-    private List<HostedByUser> hostedByUsers = new ArrayList<>();
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @PrimaryKeyJoinColumn
+    private Couch couch;
 
     @OneToOne(mappedBy = "user")
     private Message message;

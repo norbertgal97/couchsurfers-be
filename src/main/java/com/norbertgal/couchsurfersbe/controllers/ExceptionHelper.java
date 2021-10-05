@@ -28,9 +28,39 @@ public class ExceptionHelper {
         return new ResponseEntity<>(ex.getStatus(), HttpStatus.BAD_REQUEST);
     }
 
+    @ExceptionHandler(value = {EmptyFieldsException.class})
+    public ResponseEntity<StatusDTO> handleEmptyFieldsException(EmptyFieldsException ex) {
+        return new ResponseEntity<>(ex.getStatus(), HttpStatus.UNPROCESSABLE_ENTITY);
+    }
+
+    @ExceptionHandler(value = {EmptyFileException.class})
+    public ResponseEntity<StatusDTO> handleEmptyFileException(EmptyFileException ex) {
+        return new ResponseEntity<>(ex.getStatus(), HttpStatus.UNPROCESSABLE_ENTITY);
+    }
+
+    @ExceptionHandler(value = {IOException.class})
+    public ResponseEntity<StatusDTO> handleIOException(IOException ex) {
+        return new ResponseEntity<>(ex.getStatus(), HttpStatus.UNPROCESSABLE_ENTITY);
+    }
+
+    @ExceptionHandler(value = {UnknownUserException.class})
+    public ResponseEntity<StatusDTO> handleUnknownUserException(UnknownUserException ex) {
+        return new ResponseEntity<>(ex.getStatus(), HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @ExceptionHandler(value = {EntityAlreadyExistsException.class})
+    public ResponseEntity<StatusDTO> handleEntityAlreadyExistsException(EntityAlreadyExistsException ex) {
+        return new ResponseEntity<>(ex.getStatus(), HttpStatus.CONFLICT);
+    }
+
+    @ExceptionHandler(value = {WrongIdentifierException.class})
+    public ResponseEntity<StatusDTO> handleWrongIdentifierException(WrongIdentifierException ex) {
+        return new ResponseEntity<>(ex.getStatus(), HttpStatus.FORBIDDEN);
+    }
+
     @ExceptionHandler(value = {AlreadyRegisteredEmailException.class})
     public ResponseEntity<StatusDTO> handleAlreadyRegisteredEmailException(AlreadyRegisteredEmailException ex) {
-        return new ResponseEntity<>(ex.getStatus(), HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(ex.getStatus(), HttpStatus.CONFLICT);
     }
 
     @ExceptionHandler(value = {BadCredentialsException.class})

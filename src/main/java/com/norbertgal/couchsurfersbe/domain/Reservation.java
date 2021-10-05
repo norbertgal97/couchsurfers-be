@@ -15,6 +15,7 @@ import java.util.Date;
 public class Reservation {
 
     @EmbeddedId
+    @Builder.Default
     private ReservationId id = new ReservationId();
 
     @ManyToOne(fetch = FetchType.LAZY)
