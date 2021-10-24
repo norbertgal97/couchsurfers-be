@@ -1,7 +1,8 @@
 package com.norbertgal.couchsurfersbe.services;
 
-import com.norbertgal.couchsurfersbe.api.v1.mapper.CouchMapper;
+import com.norbertgal.couchsurfersbe.api.v1.mapper.CouchPreviewMapper;
 import com.norbertgal.couchsurfersbe.api.v1.mapper.OwnHostedCouchMapper;
+import com.norbertgal.couchsurfersbe.api.v1.model.CouchPreviewDTO;
 import com.norbertgal.couchsurfersbe.api.v1.model.HostDTO;
 import com.norbertgal.couchsurfersbe.api.v1.model.OwnHostedCouchDTO;
 import com.norbertgal.couchsurfersbe.api.v1.model.StatusDTO;
@@ -9,31 +10,34 @@ import com.norbertgal.couchsurfersbe.api.v1.model.exception.*;
 import com.norbertgal.couchsurfersbe.domain.Couch;
 import com.norbertgal.couchsurfersbe.domain.User;
 import com.norbertgal.couchsurfersbe.repositories.CouchRepository;
+import com.norbertgal.couchsurfersbe.repositories.ReservationRepository;
 import com.norbertgal.couchsurfersbe.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
-import java.util.Optional;
+import java.util.*;
 
 @Profile("dev")
 @Service
 public class HostServiceImpl implements HostService {
     private final OwnHostedCouchMapper ownHostedCouchMapper;
-    private final CouchMapper couchMapper;
+    private final CouchPreviewMapper couchPreviewMapper;
     private final UserRepository userRepository;
     private final CouchRepository couchRepository;
+    private final ReservationRepository reservationRepository;
 
     @Autowired
-    public HostServiceImpl(CouchMapper couchMapper,
-                           OwnHostedCouchMapper ownHostedCouchMapper,
+    public HostServiceImpl(OwnHostedCouchMapper ownHostedCouchMapper,
+                           CouchPreviewMapper couchPreviewMapper,
                            UserRepository userRepository,
-                           CouchRepository couchRepository) {
-        this.couchMapper = couchMapper;
+                           CouchRepository couchRepository,
+                           ReservationRepository reservationRepository) {
         this.ownHostedCouchMapper = ownHostedCouchMapper;
+        this.couchPreviewMapper = couchPreviewMapper;
         this.userRepository = userRepository;
         this.couchRepository = couchRepository;
+        this.reservationRepository = reservationRepository;
     }
 
     @Override
@@ -86,6 +90,55 @@ public class HostServiceImpl implements HostService {
         response.setHosted(hostedCouch.getHosted());
 
         return response;
+    }
+
+    @Override
+    public List<CouchPreviewDTO> filterHostedCouches(Long userId, String city, Integer guests, Date checkin, Date checkout) throws EmptyFieldsException, UnknownUserException {
+        if(city == null || guests == null || checkin == null || checkout == null) {
+            throw new EmptyFieldsException(StatusDTO.builder()
+                    .timestamp(new Date())
+                    .errorCode(422)
+                    .errorMessage("Fields can not be null!")
+                    .build());
+        }
+
+        if (city.isEmpty() || guests == 0 || checkin.after(checkout) || checkin.equals(checkout)) {
+            return new ArrayList<>();
+        }
+
+        Optional<User> optionalUser = userRepository.findById(userId);
+
+        if (optionalUser.isEmpty())
+            throw new UnknownUserException(StatusDTO.builder().timestamp(new Date()).errorCode(500).errorMessage("User is not found!").build());
+
+        Set<Long> notAvailableCouches = new HashSet<>();
+
+        if (optionalUser.get().getCouch() != null && optionalUser.get().getCouch().getId() != null) {
+            notAvailableCouches.add(optionalUser.get().getCouch().getId());
+        }
+
+        Date current = checkin;
+
+        while (current.before(checkout)) {
+            if (notAvailableCouches.isEmpty()) {
+                notAvailableCouches.addAll(reservationRepository.queryReservedCouchesBetweenDatesWithoutList(optionalUser.get().getId(), current, guests.longValue(), city));
+            } else {
+                notAvailableCouches.addAll(reservationRepository.queryReservedCouchesBetweenDates(notAvailableCouches, optionalUser.get().getId(), current, guests.longValue(), city));
+            }
+
+            System.out.println("Not available couches: " + notAvailableCouches.toString());
+
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(current);
+            calendar.add(Calendar.DATE, 1);
+            current = calendar.getTime();
+        }
+
+        if (notAvailableCouches.isEmpty()) {
+           return couchPreviewMapper.couchListToCouchPreviewDTOList(couchRepository.findAllByCityAndHostedAndEnoughSpaceWithoutList(city, guests));
+        }
+
+        return couchPreviewMapper.couchListToCouchPreviewDTOList(couchRepository.findAllByCityAndHostedAndEnoughSpace(notAvailableCouches, city, guests));
     }
 
 }

@@ -1,6 +1,8 @@
 package com.norbertgal.couchsurfersbe.services;
 
 import com.norbertgal.couchsurfersbe.api.v1.mapper.CouchMapper;
+import com.norbertgal.couchsurfersbe.api.v1.mapper.CouchPhotoMapper;
+import com.norbertgal.couchsurfersbe.api.v1.mapper.CouchPreviewMapper;
 import com.norbertgal.couchsurfersbe.api.v1.model.*;
 import com.norbertgal.couchsurfersbe.api.v1.model.exception.*;
 import com.norbertgal.couchsurfersbe.domain.Couch;
@@ -27,12 +29,21 @@ public class MyCouchServiceImpl implements MyCouchService {
     private final CouchPhotoRepository couchPhotoRepository;
 
     private final CouchMapper couchMapper;
+    private final CouchPreviewMapper couchPreviewMapper;
+    private final CouchPhotoMapper couchPhotoMapper;
 
-    public MyCouchServiceImpl(CouchRepository couchRepository, UserRepository userRepository, CouchPhotoRepository couchPhotoRepository, CouchMapper couchMapper) {
+    public MyCouchServiceImpl(CouchRepository couchRepository,
+                              UserRepository userRepository,
+                              CouchPhotoRepository couchPhotoRepository,
+                              CouchMapper couchMapper,
+                              CouchPreviewMapper couchPreviewMapper,
+                              CouchPhotoMapper couchPhotoMapper) {
         this.couchRepository = couchRepository;
         this.userRepository = userRepository;
         this.couchPhotoRepository = couchPhotoRepository;
         this.couchMapper = couchMapper;
+        this.couchPreviewMapper = couchPreviewMapper;
+        this.couchPhotoMapper = couchPhotoMapper;
     }
 
     @Override
@@ -100,11 +111,7 @@ public class MyCouchServiceImpl implements MyCouchService {
     }
 
     @Override
-    public CouchDTO getCouch(Long couchId, Long userId) throws NotFoundException, WrongIdentifierException {
-        if (!couchId.equals(userId)) {
-            throw new WrongIdentifierException(StatusDTO.builder().timestamp(new Date()).errorCode(403).errorMessage("You can't access this resource!").build());
-        }
-
+    public CouchDTO getCouch(Long couchId, Long userId) throws NotFoundException {
         Optional<Couch> optionalCouch = couchRepository.findById(couchId);
 
         if (optionalCouch.isEmpty()) {
@@ -114,8 +121,18 @@ public class MyCouchServiceImpl implements MyCouchService {
         return couchMapper.couchToCouchDTO(optionalCouch.get());
     }
 
+    public CouchPreviewDTO getNewestCouch() throws NotFoundException {
+        Optional<Couch> optionalCouch = couchRepository.findFirstByOrderByIdDesc();
+
+        if (optionalCouch.isEmpty()) {
+            throw new NotFoundException(StatusDTO.builder().timestamp(new Date()).errorCode(404).errorMessage("Newest couch is not found!").build());
+        }
+
+        return couchPreviewMapper.couchToCouchPreviewDTO(optionalCouch.get());
+    }
+
     @Override
-    public List<FileUploadDTO> uploadImages(Long couchId, MultipartFile[] images, Long userId) throws WrongIdentifierException, NotFoundException, EmptyFileException, IOException {
+    public List<CouchPhotoDTO> uploadImages(Long couchId, MultipartFile[] images, Long userId) throws WrongIdentifierException, NotFoundException, EmptyFileException, IOException {
         if (!couchId.equals(userId)) {
             throw new WrongIdentifierException(StatusDTO.builder().timestamp(new Date()).errorCode(403).errorMessage("You can't access this resource!").build());
         }
@@ -152,21 +169,10 @@ public class MyCouchServiceImpl implements MyCouchService {
 
         List<CouchPhoto> savedImages = couchPhotoRepository.saveAll(couchPhotos);
 
-        List<FileUploadDTO> response = new ArrayList<>();
-
-        for(CouchPhoto image: savedImages) {
-            FileUploadDTO fileUploadDTO = new FileUploadDTO();
-            fileUploadDTO.setId(image.getId());
-            fileUploadDTO.setSize(image.getPhoto().length);
-            fileUploadDTO.setName(image.getFileName());
-            response.add(fileUploadDTO);
-        }
-
-        return response;
+        return couchPhotoMapper.toCouchPhotoDTOList(savedImages);
     }
 
-    @Override
-    public FileDownloadDTO downloadImage(Long couchId, Long imageId, Long userId) throws NotFoundException {
+    public byte[] downloadImage(Long couchId, Long imageId, Long userId) throws NotFoundException {
         Optional<CouchPhoto> optionalCouchPhoto = couchPhotoRepository.findById(imageId);
 
         if (optionalCouchPhoto.isEmpty()) {
@@ -175,13 +181,7 @@ public class MyCouchServiceImpl implements MyCouchService {
 
         CouchPhoto couchPhoto = optionalCouchPhoto.get();
 
-        FileDownloadDTO fileDownloadDTO = new FileDownloadDTO();
-        fileDownloadDTO.setId(couchPhoto.getId());
-        fileDownloadDTO.setName(couchPhoto.getFileName());
-        fileDownloadDTO.setType(couchPhoto.getType());
-        fileDownloadDTO.setContent(couchPhoto.getPhoto());
-
-        return fileDownloadDTO;
+        return couchPhoto.getPhoto();
     }
 
     @Override
@@ -198,10 +198,10 @@ public class MyCouchServiceImpl implements MyCouchService {
     }
 
 
-    private void patchCouch(Map<?, ?> fields, Couch object) {
+    private void patchCouch(Map<String, Object> fields, Couch object) {
         fields.forEach((key, value) -> {
             try {
-                CouchDTO.CodingKeys decodedKey = CouchDTO.CodingKeys.fromJsonProperty((String) key);
+                CouchDTO.CodingKeys decodedKey = CouchDTO.CodingKeys.fromJsonProperty(key);
 
                 updateField(Couch.class, decodedKey.toString(), object ,value);
             } catch (IllegalArgumentException ex) {

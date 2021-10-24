@@ -14,10 +14,6 @@ import javax.persistence.*;
 @Table(name = "couch_photo")
 public class CouchPhoto extends BaseEntity {
 
-    @NotNull
-    @Column(name = "uuid", unique = true)
-    private String uuid;
-
     @ManyToOne
     @JoinColumn(name = "couch_id", nullable = false)
     private Couch couch;
@@ -27,7 +23,8 @@ public class CouchPhoto extends BaseEntity {
     @NotNull
     private byte[] photo;
 
-    @Column(name = "file_name")
+    @NotNull
+    @Column(name = "file_name", unique = true)
     private String fileName;
 
     @Column(name = "type")

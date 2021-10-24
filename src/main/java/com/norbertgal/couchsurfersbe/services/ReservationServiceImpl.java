@@ -2,9 +2,7 @@ package com.norbertgal.couchsurfersbe.services;
 
 import com.norbertgal.couchsurfersbe.api.v1.mapper.OwnReservationMapper;
 import com.norbertgal.couchsurfersbe.api.v1.mapper.OwnReservationPreviewMapper;
-import com.norbertgal.couchsurfersbe.api.v1.model.OwnReservationDTO;
-import com.norbertgal.couchsurfersbe.api.v1.model.OwnReservationPreviewDTO;
-import com.norbertgal.couchsurfersbe.api.v1.model.StatusDTO;
+import com.norbertgal.couchsurfersbe.api.v1.model.*;
 import com.norbertgal.couchsurfersbe.api.v1.model.exception.*;
 import com.norbertgal.couchsurfersbe.api.v1.model.request.ReservationRequestDTO;
 import com.norbertgal.couchsurfersbe.domain.Couch;
@@ -17,11 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
-import java.time.ZoneId;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -49,13 +43,6 @@ public class ReservationServiceImpl implements ReservationService {
     }
 
     @Override
-    public List<OwnReservationPreviewDTO> getAllReservations() {
-        return reservationRepository.findAll().stream()
-                .map(ownReservationPreviewMapper::toReservationPreviewDTO)
-                .collect(Collectors.toList());
-    }
-
-    @Override
     public List<OwnReservationPreviewDTO> getOwnReservations(Long userId) {
         return reservationRepository.findByUserId(userId).stream()
                 .map(ownReservationPreviewMapper::toReservationPreviewDTO)
@@ -63,41 +50,72 @@ public class ReservationServiceImpl implements ReservationService {
     }
 
     @Override
-    public OwnReservationDTO getOwnReservation(Long userId, Long couchId) throws NotFoundException {
-        Optional<Reservation> optionalReservation = reservationRepository.findByUserIdAndCouchId(userId, couchId);
+    public OwnReservationDTO getOwnReservationDetails(Long reservationId, Long userId) throws NotFoundException, WrongIdentifierException {
+        Optional<Reservation> optionalReservation = reservationRepository.findById(reservationId);
 
         if (optionalReservation.isEmpty())
             throw new NotFoundException(StatusDTO.builder().timestamp(new Date()).errorCode(404).errorMessage("Reservation is not found!").build());
+
+        Reservation reservation = optionalReservation.get();
+
+        if (!reservation.getUser().getId().equals(userId)) {
+            throw new WrongIdentifierException(StatusDTO.builder().timestamp(new Date()).errorCode(403).errorMessage("You can't access this resource!").build());
+        }
 
         return ownReservationMapper.toOwnReservationDTO(optionalReservation.get());
     }
 
     @Override
-    public OwnReservationDTO bookCouch(ReservationRequestDTO reservationRequestDTO) throws NotFoundException, NotBookedException, AlreadyBookedException, NotEnoughFreeSpaceException {
-        Optional<User> optionalUser = userRepository.findById(reservationRequestDTO.getUserId());
+    public ReserveDTO bookCouch(ReservationRequestDTO reservationRequestDTO, Long userId) throws NotFoundException, AlreadyBookedException, NotEnoughFreeSpaceException, UnknownUserException {
+        Optional<User> optionalUser = userRepository.findById(userId);
         Optional<Couch> optionalCouch = couchRepository.findById(reservationRequestDTO.getCouchId());
+
+        if (optionalUser.isEmpty())
+            throw new UnknownUserException(StatusDTO.builder().timestamp(new Date()).errorCode(500).errorMessage("User is not found!").build());
 
         if (optionalCouch.isEmpty())
             throw new NotFoundException(StatusDTO.builder().timestamp(new Date()).errorCode(404).errorMessage("Couch is not found!").build());
 
-        if (optionalUser.isEmpty())
-            throw new NotFoundException(StatusDTO.builder().timestamp(new Date()).errorCode(404).errorMessage("User is not found!").build());
-
         User user = optionalUser.get();
         Couch couch = optionalCouch.get();
 
-        Optional<Reservation> optionalReservation = reservationRepository.findByUserIdAndCouchId(user.getId(), couch.getId());
-        if (optionalReservation.isPresent())
-            throw new AlreadyBookedException(StatusDTO.builder().timestamp(new Date()).errorCode(400).errorMessage("You have already booked this accommodation!").build());
+        Date current = reservationRequestDTO.getStartDate();
 
-        LocalDate startLocalDate = reservationRequestDTO.getStartDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
-        LocalDate endLocalDate = reservationRequestDTO.getEndDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+        Set<Long> ownReservationsBetweenDates = new HashSet<>();
 
-        for (LocalDate current = startLocalDate; !current.isAfter(endLocalDate); current = current.plusDays(1)) {
-            int numberOfGuestsOnSpecificDate = reservationRepository.queryNumberOfGuestsOnSpecificDate(couch.getId(), Date.from(current.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant()));
+        while (current.before(reservationRequestDTO.getEndDate())) {
+            List<Long> ownReservationsOnSpecificDate = reservationRepository.queryOwnReservationsBetweenDates(optionalUser.get().getId(), optionalCouch.get().getId(), current);
 
-            if (couch.getNumberOfGuests() - numberOfGuestsOnSpecificDate < reservationRequestDTO.getNumberOfGuests())
-                throw new NotEnoughFreeSpaceException(StatusDTO.builder().timestamp(new Date()).errorCode(400).errorMessage("Could not reserve enough space for guests").build());
+            if (ownReservationsOnSpecificDate != null && !ownReservationsOnSpecificDate.isEmpty() ) {
+                ownReservationsBetweenDates.addAll(ownReservationsOnSpecificDate);
+            }
+
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(current);
+            calendar.add(Calendar.DATE, 1);
+            current = calendar.getTime();
+        }
+
+        if (!ownReservationsBetweenDates.isEmpty()) {
+            throw new AlreadyBookedException(StatusDTO.builder().timestamp(new Date()).errorCode(422).errorMessage("You have already booked this accommodation!").build());
+        }
+
+        current = reservationRequestDTO.getStartDate();
+
+        while (current.before(reservationRequestDTO.getEndDate())) {
+            Integer numberOfGuestsOnSpecificDate = reservationRepository.queryNumberOfGuestsOnSpecificDate(couch.getId(), current);
+
+            if (numberOfGuestsOnSpecificDate != null) {
+                System.out.println("Number of reservations on specific day: " + numberOfGuestsOnSpecificDate + "   " + current);
+
+                if (couch.getNumberOfGuests() - numberOfGuestsOnSpecificDate < reservationRequestDTO.getNumberOfGuests())
+                    throw new NotEnoughFreeSpaceException(StatusDTO.builder().timestamp(new Date()).errorCode(422).errorMessage("Could not reserve enough space for guests").build());
+            }
+
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(current);
+            calendar.add(Calendar.DATE, 1);
+            current = calendar.getTime();
         }
 
         Reservation reservation = new Reservation();
@@ -111,11 +129,7 @@ public class ReservationServiceImpl implements ReservationService {
 
         userRepository.save(user);
 
-        optionalReservation = reservationRepository.findByUserIdAndCouchId(user.getId(), couch.getId());
-        if (optionalReservation.isEmpty())
-            throw new NotBookedException(StatusDTO.builder().timestamp(new Date()).errorCode(400).errorMessage("The accommodation could not be booked!").build());
-
-        return ownReservationMapper.toOwnReservationDTO(optionalReservation.get());
+        return new ReserveDTO(true);
     }
 
     @Override

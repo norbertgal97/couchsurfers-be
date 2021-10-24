@@ -6,9 +6,10 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
-public class OwnHostedCouchDTO {
+@AllArgsConstructor
+public class CouchPreviewDTO {
+
     @JsonProperty("couch_id")
     private Long couchId;
 
@@ -17,7 +18,8 @@ public class OwnHostedCouchDTO {
 
     private String name;
 
-    private String about;
+    private String city;
 
-    private Boolean hosted;
+    private Double price;
+
 }

@@ -3,8 +3,6 @@ package com.norbertgal.couchsurfersbe.api.v1.mapper;
 import com.norbertgal.couchsurfersbe.api.v1.model.CouchPhotoDTO;
 import com.norbertgal.couchsurfersbe.domain.CouchPhoto;
 import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import org.mapstruct.Mappings;
 import org.mapstruct.Named;
 import org.mapstruct.factory.Mappers;
 
@@ -18,29 +16,51 @@ public interface CouchPhotoMapper {
 
     List<CouchPhotoDTO> toCouchPhotoDTOList(List<CouchPhoto> couchPhotos);
 
-    @Mappings({
-            @Mapping(target = "photo", source ="couchPhoto.photo")
-    })
-    CouchPhotoDTO toCouchPhotoDTO(CouchPhoto couchPhoto);
+    @Named("urls")
+    default List<CouchPhotoDTO> toCouchPhotoIds(List<CouchPhoto> couchPhotos) {
+        String BASE_URL = "/api/v1/couches";
+        List<CouchPhotoDTO> couchPhotoDTOs = new ArrayList<>();
 
-    @Named("ids")
-    default List<Long> toCouchPhotoIds(List<CouchPhoto> couchPhotos) {
-        List<Long> longList = new ArrayList<>();
-
-        for(CouchPhoto couchPhoto : couchPhotos) {
-            longList.add(couchPhoto.getId());
+        if (couchPhotos == null) {
+            return couchPhotoDTOs;
         }
 
-        return longList;
+        for(CouchPhoto couchPhoto : couchPhotos) {
+            CouchPhotoDTO couchPhotoDTO = new CouchPhotoDTO();
+            couchPhotoDTO.setId(couchPhoto.getId());
+            couchPhotoDTO.setName(couchPhoto.getFileName());
+            couchPhotoDTO.setUrl(BASE_URL + "/" + couchPhoto.getCouch().getId() + "/images/" + couchPhoto.getId());
+
+            couchPhotoDTOs.add(couchPhotoDTO);
+        }
+
+        return couchPhotoDTOs;
     }
 
     @Named("firstElement")
-    default Long listToCouchPhotoDTO(List<CouchPhoto> couchPhotos) {
+    default String listToCouchPhotoDTO(List<CouchPhoto> couchPhotos) {
+        String BASE_URL = "/api/v1/couches";
+
         if (couchPhotos.isEmpty()) {
             return null;
         } else {
             Random random = new Random();
-            return couchPhotos.get(random.nextInt(couchPhotos.size())).getId();
+            CouchPhoto couchPhoto = couchPhotos.get(random.nextInt(couchPhotos.size()));
+            Long couchPhotoId = couchPhoto.getId();
+            Long couchId = couchPhoto.getCouch().getId();
+
+            return BASE_URL + "/" + couchId + "/images/" + couchPhotoId;
         }
+    }
+
+    default CouchPhotoDTO toCouchPhotoDTO(CouchPhoto photo) {
+        String BASE_URL = "/api/v1/couches";
+        CouchPhotoDTO couchPhotoDTO = new CouchPhotoDTO();
+
+        couchPhotoDTO.setId(photo.getId());
+        couchPhotoDTO.setName(photo.getFileName());
+        couchPhotoDTO.setUrl(BASE_URL + "/" + photo.getCouch().getId() + "/images/" + photo.getId());
+
+        return couchPhotoDTO;
     }
 }

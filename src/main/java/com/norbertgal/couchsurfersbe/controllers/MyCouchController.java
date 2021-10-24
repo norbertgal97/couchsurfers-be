@@ -5,6 +5,7 @@ import com.norbertgal.couchsurfersbe.api.v1.model.exception.*;
 import com.norbertgal.couchsurfersbe.services.MyCouchService;
 import com.norbertgal.couchsurfersbe.services.authentication.UserDetailsImpl;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -35,18 +36,26 @@ public class MyCouchController {
     }
 
     @GetMapping(value = "/{id}")
-    public ResponseEntity<CouchDTO> getCouch(@PathVariable("id") Long id, @AuthenticationPrincipal UserDetailsImpl userDetails) throws NotFoundException, WrongIdentifierException {
+    public ResponseEntity<CouchDTO> getCouch(@PathVariable("id") Long id, @AuthenticationPrincipal UserDetailsImpl userDetails) throws NotFoundException {
         return new ResponseEntity<>(myCouchService.getCouch(id, userDetails.getUserId()), HttpStatus.OK);
     }
 
+    @GetMapping(value = "/newest")
+    public ResponseEntity<CouchPreviewDTO> getNewestCouch() throws NotFoundException {
+        return new ResponseEntity<>(myCouchService.getNewestCouch(), HttpStatus.OK);
+    }
+
     @PostMapping(value = "/{id}/images")
-    public ResponseEntity<List<FileUploadDTO>> uploadImages(@PathVariable("id") Long id, @RequestParam("images") MultipartFile[] images, @AuthenticationPrincipal UserDetailsImpl userDetails) throws WrongIdentifierException, EmptyFileException, NotFoundException, IOException {
+    public ResponseEntity<List<CouchPhotoDTO>> uploadImages(@PathVariable("id") Long id, @RequestParam("images") MultipartFile[] images, @AuthenticationPrincipal UserDetailsImpl userDetails) throws WrongIdentifierException, EmptyFileException, NotFoundException, IOException {
         return new ResponseEntity<>(myCouchService.uploadImages(id, images, userDetails.getUserId()), HttpStatus.OK);
     }
 
-    @GetMapping(value = "/{id}/images/{image_id}")
-    public ResponseEntity<FileDownloadDTO> downloadImage(@PathVariable("id") Long couchId, @PathVariable("image_id") Long imageId, @AuthenticationPrincipal UserDetailsImpl userDetails) throws WrongIdentifierException, NotFoundException {
-        return new ResponseEntity<>(myCouchService.downloadImage(couchId, imageId, userDetails.getUserId()), HttpStatus.OK);
+    @GetMapping(value = "/{id}/images/{image_id}", produces = MediaType.IMAGE_JPEG_VALUE)
+    public ResponseEntity<byte[]> downloadImage(@PathVariable("id") Long couchId, @PathVariable("image_id") Long imageId, @AuthenticationPrincipal UserDetailsImpl userDetails) throws WrongIdentifierException, NotFoundException {
+        return ResponseEntity
+                .ok()
+                .contentType(MediaType.IMAGE_JPEG)
+                .body(myCouchService.downloadImage(couchId, imageId, userDetails.getUserId()));
     }
 
     @DeleteMapping(value = "/{id}/images")

@@ -12,11 +12,19 @@ import java.util.Date;
 @NoArgsConstructor
 public class OwnReservationPreviewDTO {
 
-    @JsonProperty("user_id")
-    private Long userId;
+    private Long id;
 
     @JsonProperty("couch_id")
     private Long couchId;
+
+    @JsonProperty("couch_photo_id")
+    private String couchPhotoId;
+
+    private String name;
+
+    private String city;
+
+    private Double price;
 
     @JsonProperty("start_date")
     private Date startDate;
@@ -24,13 +32,9 @@ public class OwnReservationPreviewDTO {
     @JsonProperty("end_date")
     private Date endDate;
 
-    @JsonProperty("couch_photo_id")
-    private Long couchPhotoId;
+    private Boolean active;
 
-    private LocationDTO location;
-
-    private String amenities;
-
-    private Double rating;
+    @JsonProperty("number_of_guests")
+    private Integer numberOfGuests;
 
 }

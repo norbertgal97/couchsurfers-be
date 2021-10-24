@@ -19,7 +19,7 @@ public interface CouchMapper {
             @Mapping(target = "about", source = "couch.about"),
             @Mapping(target = "amenities", source = "couch.amenities"),
             @Mapping(target = "price", source = "couch.price"),
-            @Mapping(target = "couchPhotoIds", source = "couch.couchPhotos", qualifiedByName = "ids"),
+            @Mapping(target = "couchPhotos", source = "couch.couchPhotos", qualifiedByName = "urls"),
             @Mapping(target = "location.zipCode", source = "couch.location.zipCode"),
             @Mapping(target = "location.city", source = "couch.location.city"),
             @Mapping(target = "location.street", source = "couch.location.street"),

@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class CouchPhotoDTO {
 
-    private byte[] photo;
-
+    private Long id;
+    private String name;
+    private String url;
 }

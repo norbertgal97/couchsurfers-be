@@ -30,8 +30,8 @@ public class CouchDTO {
 
     private LocationDTO location;
 
-    @JsonProperty("couch_photo_ids")
-    private List<Long> couchPhotoIds;
+    @JsonProperty("couch_photos")
+    private List<CouchPhotoDTO> couchPhotos;
 
     public enum CodingKeys {
         id("id"),

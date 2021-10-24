@@ -12,11 +12,13 @@ public interface MyCouchService {
 
     CouchDTO updateCouch(Map<String, Object> fields, long userId, Long couchId) throws NotFoundException, EmptyFieldsException, WrongIdentifierException;
 
-    CouchDTO getCouch(Long couchId, Long userId) throws NotFoundException, WrongIdentifierException;
+    CouchDTO getCouch(Long couchId, Long userId) throws NotFoundException;
 
-    List<FileUploadDTO> uploadImages(Long couchId, MultipartFile[] images, Long userId) throws WrongIdentifierException, NotFoundException, EmptyFileException, IOException;
+    CouchPreviewDTO getNewestCouch() throws NotFoundException;
 
-    FileDownloadDTO downloadImage(Long couchId, Long imageId, Long userId) throws WrongIdentifierException, NotFoundException;
+    List<CouchPhotoDTO> uploadImages(Long couchId, MultipartFile[] images, Long userId) throws WrongIdentifierException, NotFoundException, EmptyFileException, IOException;
+
+    byte[] downloadImage(Long couchId, Long imageId, Long userId) throws WrongIdentifierException, NotFoundException;
 
     MessageDTO deleteImages(Long couchId, FileDeleteDTO request, Long userId) throws WrongIdentifierException, NotFoundException;
 }

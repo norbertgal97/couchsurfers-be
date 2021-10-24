@@ -1,13 +1,16 @@
 package com.norbertgal.couchsurfersbe.controllers;
 
-import com.norbertgal.couchsurfersbe.api.v1.model.OwnReservationDTO;
-import com.norbertgal.couchsurfersbe.api.v1.model.OwnReservationPreviewListDTO;
+import com.norbertgal.couchsurfersbe.api.v1.model.*;
 import com.norbertgal.couchsurfersbe.api.v1.model.exception.*;
 import com.norbertgal.couchsurfersbe.api.v1.model.request.ReservationRequestDTO;
 import com.norbertgal.couchsurfersbe.services.ReservationService;
+import com.norbertgal.couchsurfersbe.services.authentication.UserDetailsImpl;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping(ReservationController.BASE_URL)
@@ -20,27 +23,22 @@ public class ReservationController {
         this.reservationService = reservationService;
     }
 
-    @GetMapping(value = "/all")
-    public ResponseEntity<OwnReservationPreviewListDTO> getListOfReservations() {
-        return new ResponseEntity<>(new OwnReservationPreviewListDTO(reservationService.getAllReservations()), HttpStatus.OK);
+    @GetMapping(value = "/")
+    public ResponseEntity<List<OwnReservationPreviewDTO>> getOwnReservations(@AuthenticationPrincipal UserDetailsImpl userDetails) {
+        return new ResponseEntity<>(reservationService.getOwnReservations(userDetails.getUserId()), HttpStatus.OK);
     }
 
-    @GetMapping(value = "/query/reservations")
-    public ResponseEntity<OwnReservationPreviewListDTO> getOwnReservations(@RequestParam(name = "userid") Long userId) {
-        return new ResponseEntity<>(new OwnReservationPreviewListDTO(reservationService.getOwnReservations(userId)), HttpStatus.OK);
-    }
-
-    @GetMapping(value = "/query/reservation")
-    public ResponseEntity<OwnReservationDTO> getOwnReservation(@RequestParam(name = "userid") Long userId,
-                                                               @RequestParam(name = "couchid") Long couchId) throws NotFoundException {
-        OwnReservationDTO ownReservation = reservationService.getOwnReservation(userId, couchId);
+    @GetMapping(value = "/{reservationId}")
+    public ResponseEntity<OwnReservationDTO> getOwnReservationDetails(@PathVariable(name = "reservationId") Long reservationId,
+                                                                      @AuthenticationPrincipal UserDetailsImpl userDetails) throws NotFoundException, WrongIdentifierException {
+        OwnReservationDTO ownReservation = reservationService.getOwnReservationDetails(reservationId, userDetails.getUserId());
         return new ResponseEntity<>(ownReservation, HttpStatus.OK);
     }
 
-    @PostMapping(value = "/book")
-    public ResponseEntity<OwnReservationDTO> bookCouch(@RequestBody ReservationRequestDTO request) throws NotFoundException, NotBookedException, AlreadyBookedException, NotEnoughFreeSpaceException {
-        OwnReservationDTO ownReservation = reservationService.bookCouch(request);
-        return new ResponseEntity<>(ownReservation, HttpStatus.OK);
+    @PostMapping(value = "/")
+    public ResponseEntity<ReserveDTO> bookCouch(@RequestBody ReservationRequestDTO request,
+                                                @AuthenticationPrincipal UserDetailsImpl userDetails) throws NotFoundException, AlreadyBookedException, NotEnoughFreeSpaceException, UnknownUserException {
+        return new ResponseEntity<>(reservationService.bookCouch(request, userDetails.getUserId()), HttpStatus.OK);
     }
 
     @DeleteMapping(value = "/cancel")

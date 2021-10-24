@@ -70,12 +70,12 @@ public class ExceptionHelper {
 
     @ExceptionHandler(value = {AlreadyBookedException.class})
     public ResponseEntity<StatusDTO> handleAlreadyBookedException(AlreadyBookedException ex) {
-        return new ResponseEntity<>(ex.getStatus(), HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(ex.getStatus(), HttpStatus.CONFLICT);
     }
 
     @ExceptionHandler(value = {NotEnoughFreeSpaceException.class})
     public ResponseEntity<StatusDTO> handleNotEnoughFreeSpaceException(NotEnoughFreeSpaceException ex) {
-        return new ResponseEntity<>(ex.getStatus(), HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(ex.getStatus(), HttpStatus.CONFLICT);
     }
 
 }

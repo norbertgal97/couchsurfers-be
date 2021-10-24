@@ -4,6 +4,7 @@ import com.norbertgal.couchsurfersbe.api.v1.model.*;
 import com.norbertgal.couchsurfersbe.api.v1.model.exception.NotBookedException;
 import com.norbertgal.couchsurfersbe.api.v1.model.exception.NotFoundException;
 import com.norbertgal.couchsurfersbe.api.v1.model.exception.TooLateToCancelReservationException;
+import com.norbertgal.couchsurfersbe.api.v1.model.exception.WrongIdentifierException;
 import com.norbertgal.couchsurfersbe.api.v1.model.request.ReservationRequestDTO;
 import com.norbertgal.couchsurfersbe.services.ReservationService;
 import org.springframework.context.annotation.Profile;
@@ -26,12 +27,12 @@ public class ReservationServiceDummy implements ReservationService {
     }
 
     @Override
-    public OwnReservationDTO getOwnReservation(Long userId, Long couchId) throws NotFoundException {
+    public OwnReservationDTO getOwnReservationDetails(Long reservationId, Long userId) throws NotFoundException, WrongIdentifierException {
         return null;
     }
 
     @Override
-    public OwnReservationDTO bookCouch(ReservationRequestDTO reservationRequestDTO) throws NotFoundException, NotBookedException {
+    public ReserveDTO bookCouch(ReservationRequestDTO reservationRequestDTO, Long userId) throws NotFoundException {
         return null;
     }
 
@@ -70,10 +71,10 @@ public class ReservationServiceDummy implements ReservationService {
 
         reservation.setEndDate(new GregorianCalendar(2021, Calendar.FEBRUARY, 15).getTime());
         reservation.setStartDate(new GregorianCalendar(2021, Calendar.FEBRUARY, 11).getTime());
-        reservation.setAmenities(couchDTO.getAmenities());
+        //reservation.setAmenities(couchDTO.getAmenities());
         //reservation.setCouchPhoto(couchPhotoDTO);
-        reservation.setLocation(couchDTO.getLocation());
-        reservation.setRating(4.3);
+        //reservation.setLocation(couchDTO.getLocation());
+        //reservation.setRating(4.3);
 
         List<OwnReservationPreviewDTO> reservations = new ArrayList<>();
         reservations.add(reservation);

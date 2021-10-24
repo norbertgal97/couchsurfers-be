@@ -12,22 +12,18 @@ import java.util.Date;
 @Builder
 @Entity
 @Table(name = "reservation")
-public class Reservation {
-
-    @EmbeddedId
-    @Builder.Default
-    private ReservationId id = new ReservationId();
+public class Reservation extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @MapsId("userId")
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @MapsId("couchId")
+    @JoinColumn(name = "couch_id", nullable = false)
     private Couch couch;
 
     @Column(name = "number_of_guests")
-    private int numberOfGuests;
+    private Integer numberOfGuests;
 
     @Temporal(TemporalType.DATE)
     @Column(name = "start_date")
