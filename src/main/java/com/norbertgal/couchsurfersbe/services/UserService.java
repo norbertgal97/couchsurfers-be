@@ -1,21 +1,26 @@
 package com.norbertgal.couchsurfersbe.services;
 
-import com.norbertgal.couchsurfersbe.api.v1.model.LogoutDTO;
-import com.norbertgal.couchsurfersbe.api.v1.model.PersonalInformationDTO;
-import com.norbertgal.couchsurfersbe.api.v1.model.ProfileDTO;
-import com.norbertgal.couchsurfersbe.api.v1.model.UserDTO;
-import com.norbertgal.couchsurfersbe.api.v1.model.exception.AlreadyRegisteredEmailException;
-import com.norbertgal.couchsurfersbe.api.v1.model.exception.NotFoundException;
+import com.norbertgal.couchsurfersbe.api.v1.model.*;
+import com.norbertgal.couchsurfersbe.api.v1.model.exception.*;
 import com.norbertgal.couchsurfersbe.api.v1.model.request.LoginRequestDTO;
 import com.norbertgal.couchsurfersbe.api.v1.model.request.SignUpRequestDTO;
 import com.norbertgal.couchsurfersbe.domain.User;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.web.multipart.MultipartFile;
 
 public interface UserService {
     PersonalInformationDTO getPersonalInformation(Long userId) throws NotFoundException;
 
-    ProfileDTO getProfile(Long userId) throws NotFoundException;
+    PersonalInformationDTO updatePersonalInformation(PersonalInformationDTO personalInformationDTO, long userId, Long personalInformationId) throws UnknownUserException, EmptyFieldsException, WrongIdentifierException;
+
+    ProfileDataDTO getProfileData(Long userId) throws UnknownUserException;
+
+    UserPhotoDTO uploadImage(MultipartFile image, Long userId) throws UnknownUserException, EmptyFileException, IOException;
+
+    MessageDTO deleteImages(Long photoId, Long userId) throws  WrongIdentifierException;
+
+    byte[] downloadImage(Long imageId, Long userId) throws NotFoundException;
 
     User findByEmail(String email) throws NotFoundException;
 

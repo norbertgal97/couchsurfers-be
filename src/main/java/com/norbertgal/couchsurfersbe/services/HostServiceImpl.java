@@ -16,7 +16,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Profile("dev")
 @Service
@@ -52,6 +56,16 @@ public class HostServiceImpl implements HostService {
 
         if (couch == null)
             throw new NotFoundException(StatusDTO.builder().timestamp(new Date()).errorCode(404).errorMessage("Couch is not found!").build());
+
+        couch.setReservations(couch.getReservations().stream().filter(reservation -> {
+            Calendar calendar = Calendar.getInstance();
+            calendar.set(Calendar.HOUR_OF_DAY, 0);
+            calendar.set(Calendar.MINUTE, 0);
+            calendar.set(Calendar.SECOND, 0);
+            calendar.set(Calendar.MILLISECOND, 0);
+
+           return !reservation.getEndDate().before(calendar.getTime());
+        }).collect(Collectors.toList()));
 
         return ownHostedCouchMapper.toOwnHostedCouchDTO(couch);
     }

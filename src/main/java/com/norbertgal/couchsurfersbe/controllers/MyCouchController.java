@@ -46,7 +46,7 @@ public class MyCouchController {
     }
 
     @PostMapping(value = "/{id}/images")
-    public ResponseEntity<List<CouchPhotoDTO>> uploadImages(@PathVariable("id") Long id, @RequestParam("images") MultipartFile[] images, @AuthenticationPrincipal UserDetailsImpl userDetails) throws WrongIdentifierException, EmptyFileException, NotFoundException, IOException {
+    public ResponseEntity<List<CouchPhotoDTO>> uploadImage(@PathVariable("id") Long id, @RequestParam("images") MultipartFile[] images, @AuthenticationPrincipal UserDetailsImpl userDetails) throws WrongIdentifierException, EmptyFileException, NotFoundException, IOException {
         return new ResponseEntity<>(myCouchService.uploadImages(id, images, userDetails.getUserId()), HttpStatus.OK);
     }
 
@@ -62,6 +62,5 @@ public class MyCouchController {
     public ResponseEntity<MessageDTO> deleteImages(@PathVariable("id") Long couchId, @RequestBody FileDeleteDTO request, @AuthenticationPrincipal UserDetailsImpl userDetails) throws NotFoundException, WrongIdentifierException {
         return new ResponseEntity<>(myCouchService.deleteImages(couchId, request, userDetails.getUserId()), HttpStatus.OK);
     }
-
 
 }

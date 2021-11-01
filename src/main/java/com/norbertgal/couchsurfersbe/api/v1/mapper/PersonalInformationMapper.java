@@ -5,7 +5,7 @@ import com.norbertgal.couchsurfersbe.domain.User;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", uses = UserPhotoMapper.class)
 public interface PersonalInformationMapper {
     PersonalInformationMapper INSTANCE = Mappers.getMapper(PersonalInformationMapper.class);
 

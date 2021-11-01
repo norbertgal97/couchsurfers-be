@@ -17,11 +17,6 @@ import java.util.*;
 public class ReservationServiceDummy implements ReservationService {
 
     @Override
-    public List<OwnReservationPreviewDTO> getAllReservations() {
-        return getOwnReservationDTOs();
-    }
-
-    @Override
     public List<OwnReservationPreviewDTO> getOwnReservations(Long userId) {
         return getOwnReservationDTOs();
     }
@@ -37,8 +32,8 @@ public class ReservationServiceDummy implements ReservationService {
     }
 
     @Override
-    public void cancelReservation(Long userId, Long couchId) throws NotFoundException, TooLateToCancelReservationException {
-
+    public MessageDTO cancelReservation(Long userId, Long couchId) throws NotFoundException, TooLateToCancelReservationException {
+        return new MessageDTO(" ");
     }
 
     private List<OwnReservationPreviewDTO> getOwnReservationDTOs() {

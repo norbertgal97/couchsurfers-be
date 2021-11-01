@@ -1,5 +1,6 @@
 package com.norbertgal.couchsurfersbe.domain;
 
+import com.sun.istack.NotNull;
 import lombok.*;
 
 import javax.persistence.*;
@@ -13,10 +14,24 @@ import javax.persistence.*;
 @Table(name = "user_photo")
 public class UserPhoto extends BaseEntity {
 
-    @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+    @Id
+    @Column(name = "user_id")
+    private Long id;
 
-    @Column(name = "photo")
+    @Column(name = "photo", columnDefinition = "MEDIUMBLOB")
+    @Lob
+    @NotNull
     private byte[] photo;
+
+    @NotNull
+    @Column(name = "file_name", unique = true)
+    private String fileName;
+
+    @Column(name = "type")
+    private String type;
+
+    @OneToOne
+    @MapsId
+    @JoinColumn(name = "user_id")
+    private User user;
 }

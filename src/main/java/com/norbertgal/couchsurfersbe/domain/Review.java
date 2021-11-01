@@ -3,6 +3,7 @@ package com.norbertgal.couchsurfersbe.domain;
 import lombok.*;
 
 import javax.persistence.*;
+import java.util.Date;
 
 @Data
 @EqualsAndHashCode
@@ -11,22 +12,17 @@ import javax.persistence.*;
 @Builder
 @Entity
 @Table(name = "review")
-public class Review {
-
-    @EmbeddedId
-    private ReviewId id;
+public class Review extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @MapsId("userId")
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @MapsId("couchId")
+    @JoinColumn(name = "couch_id", nullable = false)
     private Couch couch;
-
-    @Column(name = "stars")
-    private int stars;
 
     @Column(name = "description")
     private String description;
+
 }

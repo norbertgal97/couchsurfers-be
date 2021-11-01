@@ -41,10 +41,9 @@ public class ReservationController {
         return new ResponseEntity<>(reservationService.bookCouch(request, userDetails.getUserId()), HttpStatus.OK);
     }
 
-    @DeleteMapping(value = "/cancel")
-    public ResponseEntity<HttpStatus> cancelReservation(@RequestParam(name = "userid") Long userId,
-                                                        @RequestParam(name = "couchid") Long couchId) throws NotFoundException, TooLateToCancelReservationException {
-        reservationService.cancelReservation(userId, couchId);
-        return new ResponseEntity<>(HttpStatus.OK);
+    @DeleteMapping(value = "/{reservationId}")
+    public ResponseEntity<MessageDTO> cancelReservation(@PathVariable(name = "reservationId") Long reservationId,
+                                                        @AuthenticationPrincipal UserDetailsImpl userDetails) throws NotFoundException, TooLateToCancelReservationException, WrongIdentifierException {
+        return new ResponseEntity<>(reservationService.cancelReservation(reservationId, userDetails.getUserId()), HttpStatus.OK);
     }
 }

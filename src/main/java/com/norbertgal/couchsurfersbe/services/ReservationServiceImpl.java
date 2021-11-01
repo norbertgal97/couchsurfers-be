@@ -133,20 +133,23 @@ public class ReservationServiceImpl implements ReservationService {
     }
 
     @Override
-    public void cancelReservation(Long userId, Long couchId) throws NotFoundException, TooLateToCancelReservationException {
-        Optional<Reservation> optionalReservation = reservationRepository.findByUserIdAndCouchId(userId, couchId);
-        if (optionalReservation.isPresent()) {
-            Reservation reservation = optionalReservation.get();
+    public MessageDTO cancelReservation(Long reservationId, Long userId) throws NotFoundException, TooLateToCancelReservationException, WrongIdentifierException {
+        Optional<Reservation> optionalReservation = reservationRepository.findById(reservationId);
 
-            long diff = reservation.getStartDate().getTime() - new Date().getTime();
-            if (TimeUnit.DAYS.convert(diff, TimeUnit.MILLISECONDS) >= 15) {
-                reservationRepository.delete(reservation);
-            } else {
-                throw new TooLateToCancelReservationException(StatusDTO.builder().timestamp(new Date()).errorCode(400).errorMessage("It is too late to cancel reservation!").build());
-            }
-        } else {
+        if (optionalReservation.isEmpty())
             throw new NotFoundException(StatusDTO.builder().timestamp(new Date()).errorCode(404).errorMessage("Reservation is not found!").build());
+
+        if (!optionalReservation.get().getUser().getId().equals(userId))
+            throw new WrongIdentifierException(StatusDTO.builder().timestamp(new Date()).errorCode(403).errorMessage("You can't access this resource!").build());
+
+        long diff = optionalReservation.get().getStartDate().getTime() - new Date().getTime();
+        if (TimeUnit.DAYS.convert(diff, TimeUnit.MILLISECONDS) >= 2) {
+            reservationRepository.deleteById(reservationId);
+        } else {
+            throw new TooLateToCancelReservationException(StatusDTO.builder().timestamp(new Date()).errorCode(409).errorMessage("It is too late to cancel reservation!").build());
         }
+
+        return new MessageDTO("Reservation is successfully cancelled!");
     }
 
 }

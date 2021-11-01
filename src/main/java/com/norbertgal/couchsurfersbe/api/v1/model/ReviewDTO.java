@@ -7,9 +7,11 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserPhotoDTO {
+public class ReviewDTO {
 
     private Long id;
+
     private String name;
-    private String url;
+
+    private String description;
 }

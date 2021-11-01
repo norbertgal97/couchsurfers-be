@@ -21,15 +21,6 @@ public class User extends BaseEntity {
     @Column(name = "full_name")
     private String fullName;
 
-    @Column(name = "nickname")
-    private String nickname;
-
-    @Column(name = "about")
-    private String about;
-
-    @Column(name = "work")
-    private String work;
-
     @Column(name = "email")
     private String email;
 
@@ -38,16 +29,6 @@ public class User extends BaseEntity {
 
     @Column(name = "phone_number")
     private String phoneNumber;
-
-    @Column(name = "gender")
-    @Enumerated(value = EnumType.STRING)
-    private Gender gender;
-
-    @Column(name = "date_of_birth")
-    private Date dateOfBirth;
-
-    @Column(name = "last_login")
-    private Date lastLogin;
 
     @Column(name = "created_at")
     @CreationTimestamp
@@ -73,13 +54,14 @@ public class User extends BaseEntity {
     )
     private List<Review> reviews = new ArrayList<>();
 
-    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
     @PrimaryKeyJoinColumn
     private Couch couch;
 
     @OneToOne(mappedBy = "user")
     private Message message;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    private Set<UserPhoto> userPhotos;
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+    @PrimaryKeyJoinColumn
+    private UserPhoto userPhoto;
 }

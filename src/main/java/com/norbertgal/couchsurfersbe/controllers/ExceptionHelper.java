@@ -20,7 +20,7 @@ public class ExceptionHelper {
 
     @ExceptionHandler(value = {TooLateToCancelReservationException.class})
     public ResponseEntity<StatusDTO> handleTooLateToCancelReservationException(TooLateToCancelReservationException ex) {
-        return new ResponseEntity<>(ex.getStatus(), HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(ex.getStatus(), HttpStatus.CONFLICT);
     }
 
     @ExceptionHandler(value = {NotBookedException.class})

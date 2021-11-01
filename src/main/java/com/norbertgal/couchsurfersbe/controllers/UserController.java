@@ -1,20 +1,20 @@
 package com.norbertgal.couchsurfersbe.controllers;
 
-import com.norbertgal.couchsurfersbe.api.v1.model.LogoutDTO;
-import com.norbertgal.couchsurfersbe.api.v1.model.PersonalInformationDTO;
-import com.norbertgal.couchsurfersbe.api.v1.model.ProfileDTO;
-import com.norbertgal.couchsurfersbe.api.v1.model.UserDTO;
-import com.norbertgal.couchsurfersbe.api.v1.model.exception.AlreadyRegisteredEmailException;
-import com.norbertgal.couchsurfersbe.api.v1.model.exception.NotFoundException;
+import com.norbertgal.couchsurfersbe.api.v1.model.*;
+import com.norbertgal.couchsurfersbe.api.v1.model.exception.*;
 import com.norbertgal.couchsurfersbe.api.v1.model.request.LoginRequestDTO;
 import com.norbertgal.couchsurfersbe.api.v1.model.request.SignUpRequestDTO;
 import com.norbertgal.couchsurfersbe.services.UserService;
+import com.norbertgal.couchsurfersbe.services.authentication.UserDetailsImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping(UserController.BASE_URL)
@@ -47,16 +47,39 @@ public class UserController {
         return new ResponseEntity<>(logoutDTO, HttpStatus.OK);
     }
 
-    @GetMapping(value = "/query/personalinformation")
-    public ResponseEntity<PersonalInformationDTO> getPersonalInformation(@RequestParam(name = "userid") Long userId) throws NotFoundException {
-        PersonalInformationDTO personalInformation = userService.getPersonalInformation(userId);
+    @GetMapping(value = "/personalinformation")
+    public ResponseEntity<PersonalInformationDTO> getPersonalInformation(@AuthenticationPrincipal UserDetailsImpl userDetails) throws NotFoundException {
+        PersonalInformationDTO personalInformation = userService.getPersonalInformation(userDetails.getUserId());
         return new ResponseEntity<>(personalInformation, HttpStatus.OK);
     }
 
-    @GetMapping(value = "/query/profile")
-    public ResponseEntity<ProfileDTO> getProfile(@RequestParam(name = "userid") Long userId) throws NotFoundException {
-        ProfileDTO profile = userService.getProfile(userId);
-        return new ResponseEntity<>(profile, HttpStatus.OK);
+    @PatchMapping(value = "/personalinformation/{id}")
+    public ResponseEntity<PersonalInformationDTO> updatePersonalInformation(@RequestBody PersonalInformationDTO request, @PathVariable("id") Long id, @AuthenticationPrincipal UserDetailsImpl userDetails) throws UnknownUserException, EmptyFieldsException, WrongIdentifierException {
+        return new ResponseEntity<>(userService.updatePersonalInformation(request, userDetails.getUserId(), id), HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/profiledata")
+    public ResponseEntity<ProfileDataDTO> getProfileData(@AuthenticationPrincipal UserDetailsImpl userDetails) throws UnknownUserException {
+        ProfileDataDTO profileData = userService.getProfileData(userDetails.getUserId());
+        return new ResponseEntity<>(profileData, HttpStatus.OK);
+    }
+
+    @PostMapping(value = "/images")
+    public ResponseEntity<UserPhotoDTO> uploadImages(@RequestParam("image") MultipartFile image, @AuthenticationPrincipal UserDetailsImpl userDetails) throws EmptyFileException, UnknownUserException, IOException {
+        return new ResponseEntity<>(userService.uploadImage(image, userDetails.getUserId()), HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/images/{image_id}", produces = MediaType.IMAGE_JPEG_VALUE)
+    public ResponseEntity<byte[]> downloadImage(@PathVariable("image_id") Long imageId, @AuthenticationPrincipal UserDetailsImpl userDetails) throws NotFoundException {
+        return ResponseEntity
+                .ok()
+                .contentType(MediaType.IMAGE_JPEG)
+                .body(userService.downloadImage(imageId, userDetails.getUserId()));
+    }
+
+    @DeleteMapping(value = "/images/{image_id}")
+    public ResponseEntity<MessageDTO> deleteImages(@PathVariable("image_id") Long photoId, @AuthenticationPrincipal UserDetailsImpl userDetails) throws WrongIdentifierException {
+        return new ResponseEntity<>(userService.deleteImages(photoId, userDetails.getUserId()), HttpStatus.OK);
     }
 
 }
