@@ -42,8 +42,8 @@ public class ReservationController {
     }
 
     @DeleteMapping(value = "/{reservationId}")
-    public ResponseEntity<MessageDTO> cancelReservation(@PathVariable(name = "reservationId") Long reservationId,
-                                                        @AuthenticationPrincipal UserDetailsImpl userDetails) throws NotFoundException, TooLateToCancelReservationException, WrongIdentifierException {
+    public ResponseEntity<StatusDTO> cancelReservation(@PathVariable(name = "reservationId") Long reservationId,
+                                                       @AuthenticationPrincipal UserDetailsImpl userDetails) throws NotFoundException, TooLateToCancelReservationException, WrongIdentifierException {
         return new ResponseEntity<>(reservationService.cancelReservation(reservationId, userDetails.getUserId()), HttpStatus.OK);
     }
 }

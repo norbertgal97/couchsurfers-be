@@ -12,18 +12,13 @@ import java.util.Date;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class MessageDTO {
+public class ErrorDTO {
 
-    private Long id;
+    private Date timestamp;
 
-    @JsonProperty("sender_id")
-    private Long senderId;
+    @JsonProperty("error_code")
+    private Integer errorCode;
 
-    @JsonProperty("sender_name")
-    private String senderName;
-
-    private String content;
-
-    @JsonProperty("created_at")
-    private Date  createdAt;
+    @JsonProperty("error_message")
+    private String errorMessage;
 }

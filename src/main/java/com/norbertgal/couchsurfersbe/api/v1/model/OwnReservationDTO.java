@@ -24,4 +24,10 @@ public class OwnReservationDTO {
     private Integer numberOfGuests;
 
     private CouchDTO couch;
+
+    @JsonProperty("owner_name")
+    private String ownerName;
+
+    @JsonProperty("owner_email")
+    private String ownerEmail;
 }

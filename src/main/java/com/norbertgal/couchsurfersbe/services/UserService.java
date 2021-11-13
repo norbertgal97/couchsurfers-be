@@ -18,7 +18,7 @@ public interface UserService {
 
     UserPhotoDTO uploadImage(MultipartFile image, Long userId) throws UnknownUserException, EmptyFileException, IOException;
 
-    MessageDTO deleteImages(Long photoId, Long userId) throws  WrongIdentifierException;
+    StatusDTO deleteImages(Long photoId, Long userId) throws  WrongIdentifierException;
 
     byte[] downloadImage(Long imageId, Long userId) throws NotFoundException;
 

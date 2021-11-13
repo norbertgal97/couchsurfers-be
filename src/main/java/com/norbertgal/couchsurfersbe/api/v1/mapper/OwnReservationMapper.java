@@ -16,7 +16,9 @@ public interface OwnReservationMapper {
             @Mapping(target = "couch", source = "reservation.couch"),
             @Mapping(target = "startDate", source = "reservation.startDate"),
             @Mapping(target = "endDate", source = "reservation.endDate"),
-            @Mapping(target = "numberOfGuests", source = "reservation.numberOfGuests")
+            @Mapping(target = "numberOfGuests", source = "reservation.numberOfGuests"),
+            @Mapping(target = "ownerName", source = "reservation.user.fullName"),
+            @Mapping(target = "ownerEmail", source = "reservation.user.email")
     })
     OwnReservationDTO toOwnReservationDTO(Reservation reservation);
 

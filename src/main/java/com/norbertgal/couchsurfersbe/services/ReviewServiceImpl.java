@@ -2,7 +2,7 @@ package com.norbertgal.couchsurfersbe.services;
 
 import com.norbertgal.couchsurfersbe.api.v1.mapper.ReviewMapper;
 import com.norbertgal.couchsurfersbe.api.v1.model.ReviewDTO;
-import com.norbertgal.couchsurfersbe.api.v1.model.StatusDTO;
+import com.norbertgal.couchsurfersbe.api.v1.model.ErrorDTO;
 import com.norbertgal.couchsurfersbe.api.v1.model.exception.EmptyFieldsException;
 import com.norbertgal.couchsurfersbe.api.v1.model.exception.NotFoundException;
 import com.norbertgal.couchsurfersbe.api.v1.model.exception.UnknownUserException;
@@ -40,7 +40,7 @@ public class ReviewServiceImpl implements ReviewService {
         Optional<Couch> optionalCouch = couchRepository.findById(couchId);
 
         if (optionalCouch.isEmpty()) {
-            throw new NotFoundException(StatusDTO.builder().timestamp(new Date()).errorCode(404).errorMessage("Couch is not found!").build());
+            throw new NotFoundException(ErrorDTO.builder().timestamp(new Date()).errorCode(404).errorMessage("Couch is not found!").build());
         }
 
         List<Review> reviews = reviewRepository.findAllByCouchId(couchId);
@@ -51,7 +51,7 @@ public class ReviewServiceImpl implements ReviewService {
     @Override
     public ReviewDTO createReview(ReviewRequestDTO request, Long userId) throws NotFoundException, EmptyFieldsException, UnknownUserException {
         if (request.getDescription() == null || request.getDescription().isEmpty()) {
-            throw new EmptyFieldsException(StatusDTO.builder()
+            throw new EmptyFieldsException(ErrorDTO.builder()
                     .timestamp(new Date())
                     .errorCode(422)
                     .errorMessage("Empty fields!")
@@ -61,12 +61,12 @@ public class ReviewServiceImpl implements ReviewService {
         Optional<User> optionalUser = userRepository.findById(userId);
 
         if (optionalUser.isEmpty())
-            throw new UnknownUserException(StatusDTO.builder().timestamp(new Date()).errorCode(500).errorMessage("User is not found!").build());
+            throw new UnknownUserException(ErrorDTO.builder().timestamp(new Date()).errorCode(500).errorMessage("User is not found!").build());
 
         Optional<Couch> optionalCouch = couchRepository.findById(request.getCouchId());
 
         if (optionalCouch.isEmpty())
-            throw new NotFoundException(StatusDTO.builder().timestamp(new Date()).errorCode(404).errorMessage("Couch is not found!").build());
+            throw new NotFoundException(ErrorDTO.builder().timestamp(new Date()).errorCode(404).errorMessage("Couch is not found!").build());
 
         Review review = new Review();
         review.setCouch(optionalCouch.get());

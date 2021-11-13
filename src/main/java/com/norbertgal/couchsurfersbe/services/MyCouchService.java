@@ -20,5 +20,5 @@ public interface MyCouchService {
 
     byte[] downloadImage(Long couchId, Long imageId, Long userId) throws WrongIdentifierException, NotFoundException;
 
-    MessageDTO deleteImages(Long couchId, FileDeleteDTO request, Long userId) throws WrongIdentifierException, NotFoundException;
+    StatusDTO deleteImages(Long couchId, FileDeleteDTO request, Long userId) throws WrongIdentifierException, NotFoundException;
 }

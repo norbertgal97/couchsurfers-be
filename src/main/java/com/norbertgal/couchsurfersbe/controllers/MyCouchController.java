@@ -59,7 +59,7 @@ public class MyCouchController {
     }
 
     @DeleteMapping(value = "/{id}/images")
-    public ResponseEntity<MessageDTO> deleteImages(@PathVariable("id") Long couchId, @RequestBody FileDeleteDTO request, @AuthenticationPrincipal UserDetailsImpl userDetails) throws NotFoundException, WrongIdentifierException {
+    public ResponseEntity<StatusDTO> deleteImages(@PathVariable("id") Long couchId, @RequestBody FileDeleteDTO request, @AuthenticationPrincipal UserDetailsImpl userDetails) throws NotFoundException, WrongIdentifierException {
         return new ResponseEntity<>(myCouchService.deleteImages(couchId, request, userDetails.getUserId()), HttpStatus.OK);
     }
 

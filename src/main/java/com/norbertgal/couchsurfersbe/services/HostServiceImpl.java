@@ -5,7 +5,7 @@ import com.norbertgal.couchsurfersbe.api.v1.mapper.OwnHostedCouchMapper;
 import com.norbertgal.couchsurfersbe.api.v1.model.CouchPreviewDTO;
 import com.norbertgal.couchsurfersbe.api.v1.model.HostDTO;
 import com.norbertgal.couchsurfersbe.api.v1.model.OwnHostedCouchDTO;
-import com.norbertgal.couchsurfersbe.api.v1.model.StatusDTO;
+import com.norbertgal.couchsurfersbe.api.v1.model.ErrorDTO;
 import com.norbertgal.couchsurfersbe.api.v1.model.exception.*;
 import com.norbertgal.couchsurfersbe.domain.Couch;
 import com.norbertgal.couchsurfersbe.domain.User;
@@ -16,9 +16,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -49,13 +46,13 @@ public class HostServiceImpl implements HostService {
         Optional<User> optionalUser = userRepository.findById(userId);
 
         if (optionalUser.isEmpty())
-            throw new UnknownUserException(StatusDTO.builder().timestamp(new Date()).errorCode(500).errorMessage("User is not found!").build());
+            throw new UnknownUserException(ErrorDTO.builder().timestamp(new Date()).errorCode(500).errorMessage("User is not found!").build());
 
         User user = optionalUser.get();
         Couch couch = user.getCouch();
 
         if (couch == null)
-            throw new NotFoundException(StatusDTO.builder().timestamp(new Date()).errorCode(404).errorMessage("Couch is not found!").build());
+            throw new NotFoundException(ErrorDTO.builder().timestamp(new Date()).errorCode(404).errorMessage("Couch is not found!").build());
 
         couch.setReservations(couch.getReservations().stream().filter(reservation -> {
             Calendar calendar = Calendar.getInstance();
@@ -76,20 +73,20 @@ public class HostServiceImpl implements HostService {
         Optional<Couch> optionalCouch = couchRepository.findById(couchId);
 
         if (optionalCouch.isEmpty())
-            throw new NotFoundException(StatusDTO.builder().timestamp(new Date()).errorCode(404).errorMessage("Couch is not found!").build());
+            throw new NotFoundException(ErrorDTO.builder().timestamp(new Date()).errorCode(404).errorMessage("Couch is not found!").build());
 
         if (optionalUser.isEmpty())
-            throw new UnknownUserException(StatusDTO.builder().timestamp(new Date()).errorCode(500).errorMessage("User is not found!").build());
+            throw new UnknownUserException(ErrorDTO.builder().timestamp(new Date()).errorCode(500).errorMessage("User is not found!").build());
 
         User user = optionalUser.get();
         Couch couch = optionalCouch.get();
 
         if (!user.getId().equals(couch.getId())) {
-            throw new WrongIdentifierException(StatusDTO.builder().timestamp(new Date()).errorCode(403).errorMessage("You can't access this resource!").build());
+            throw new WrongIdentifierException(ErrorDTO.builder().timestamp(new Date()).errorCode(403).errorMessage("You can't access this resource!").build());
         }
 
         if (request.getHosted() == null) {
-            throw new EmptyFieldsException(StatusDTO.builder()
+            throw new EmptyFieldsException(ErrorDTO.builder()
                     .timestamp(new Date())
                     .errorCode(422)
                     .errorMessage("Hosted is empty!")
@@ -109,7 +106,7 @@ public class HostServiceImpl implements HostService {
     @Override
     public List<CouchPreviewDTO> filterHostedCouches(Long userId, String city, Integer guests, Date checkin, Date checkout) throws EmptyFieldsException, UnknownUserException {
         if(city == null || guests == null || checkin == null || checkout == null) {
-            throw new EmptyFieldsException(StatusDTO.builder()
+            throw new EmptyFieldsException(ErrorDTO.builder()
                     .timestamp(new Date())
                     .errorCode(422)
                     .errorMessage("Fields can not be null!")
@@ -123,7 +120,7 @@ public class HostServiceImpl implements HostService {
         Optional<User> optionalUser = userRepository.findById(userId);
 
         if (optionalUser.isEmpty())
-            throw new UnknownUserException(StatusDTO.builder().timestamp(new Date()).errorCode(500).errorMessage("User is not found!").build());
+            throw new UnknownUserException(ErrorDTO.builder().timestamp(new Date()).errorCode(500).errorMessage("User is not found!").build());
 
         Set<Long> notAvailableCouches = new HashSet<>();
 

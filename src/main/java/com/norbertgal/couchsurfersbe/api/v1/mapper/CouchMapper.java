@@ -23,7 +23,9 @@ public interface CouchMapper {
             @Mapping(target = "location.zipCode", source = "couch.location.zipCode"),
             @Mapping(target = "location.city", source = "couch.location.city"),
             @Mapping(target = "location.street", source = "couch.location.street"),
-            @Mapping(target = "location.buildingNumber", source = "couch.location.buildingNumber")
+            @Mapping(target = "location.buildingNumber", source = "couch.location.buildingNumber"),
+            @Mapping(target = "ownerName", source = "couch.user.fullName"),
+            @Mapping(target = "ownerEmail", source = "couch.user.email")
     })
     CouchDTO couchToCouchDTO(Couch couch);
 

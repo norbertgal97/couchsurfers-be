@@ -1,6 +1,6 @@
 package com.norbertgal.couchsurfersbe.controllers;
 
-import com.norbertgal.couchsurfersbe.api.v1.model.StatusDTO;
+import com.norbertgal.couchsurfersbe.api.v1.model.ErrorDTO;
 import com.norbertgal.couchsurfersbe.api.v1.model.exception.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,67 +14,67 @@ import java.util.Date;
 public class ExceptionHelper {
 
     @ExceptionHandler(value = {NotFoundException.class})
-    public ResponseEntity<StatusDTO> handleNotFoundException(NotFoundException ex) {
+    public ResponseEntity<ErrorDTO> handleNotFoundException(NotFoundException ex) {
         return new ResponseEntity<>(ex.getStatus(), HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler(value = {TooLateToCancelReservationException.class})
-    public ResponseEntity<StatusDTO> handleTooLateToCancelReservationException(TooLateToCancelReservationException ex) {
+    public ResponseEntity<ErrorDTO> handleTooLateToCancelReservationException(TooLateToCancelReservationException ex) {
         return new ResponseEntity<>(ex.getStatus(), HttpStatus.CONFLICT);
     }
 
     @ExceptionHandler(value = {NotBookedException.class})
-    public ResponseEntity<StatusDTO> handleNotBookedException(NotBookedException ex) {
+    public ResponseEntity<ErrorDTO> handleNotBookedException(NotBookedException ex) {
         return new ResponseEntity<>(ex.getStatus(), HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(value = {EmptyFieldsException.class})
-    public ResponseEntity<StatusDTO> handleEmptyFieldsException(EmptyFieldsException ex) {
+    public ResponseEntity<ErrorDTO> handleEmptyFieldsException(EmptyFieldsException ex) {
         return new ResponseEntity<>(ex.getStatus(), HttpStatus.UNPROCESSABLE_ENTITY);
     }
 
     @ExceptionHandler(value = {EmptyFileException.class})
-    public ResponseEntity<StatusDTO> handleEmptyFileException(EmptyFileException ex) {
+    public ResponseEntity<ErrorDTO> handleEmptyFileException(EmptyFileException ex) {
         return new ResponseEntity<>(ex.getStatus(), HttpStatus.UNPROCESSABLE_ENTITY);
     }
 
     @ExceptionHandler(value = {IOException.class})
-    public ResponseEntity<StatusDTO> handleIOException(IOException ex) {
+    public ResponseEntity<ErrorDTO> handleIOException(IOException ex) {
         return new ResponseEntity<>(ex.getStatus(), HttpStatus.UNPROCESSABLE_ENTITY);
     }
 
     @ExceptionHandler(value = {UnknownUserException.class})
-    public ResponseEntity<StatusDTO> handleUnknownUserException(UnknownUserException ex) {
+    public ResponseEntity<ErrorDTO> handleUnknownUserException(UnknownUserException ex) {
         return new ResponseEntity<>(ex.getStatus(), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @ExceptionHandler(value = {EntityAlreadyExistsException.class})
-    public ResponseEntity<StatusDTO> handleEntityAlreadyExistsException(EntityAlreadyExistsException ex) {
+    public ResponseEntity<ErrorDTO> handleEntityAlreadyExistsException(EntityAlreadyExistsException ex) {
         return new ResponseEntity<>(ex.getStatus(), HttpStatus.CONFLICT);
     }
 
     @ExceptionHandler(value = {WrongIdentifierException.class})
-    public ResponseEntity<StatusDTO> handleWrongIdentifierException(WrongIdentifierException ex) {
+    public ResponseEntity<ErrorDTO> handleWrongIdentifierException(WrongIdentifierException ex) {
         return new ResponseEntity<>(ex.getStatus(), HttpStatus.FORBIDDEN);
     }
 
     @ExceptionHandler(value = {AlreadyRegisteredEmailException.class})
-    public ResponseEntity<StatusDTO> handleAlreadyRegisteredEmailException(AlreadyRegisteredEmailException ex) {
+    public ResponseEntity<ErrorDTO> handleAlreadyRegisteredEmailException(AlreadyRegisteredEmailException ex) {
         return new ResponseEntity<>(ex.getStatus(), HttpStatus.CONFLICT);
     }
 
     @ExceptionHandler(value = {BadCredentialsException.class})
-    public ResponseEntity<StatusDTO> handleBadCredentialsException(BadCredentialsException ex) {
-        return new ResponseEntity<>(StatusDTO.builder().timestamp(new Date()).errorCode(400).errorMessage("Invalid username/password supplied").build(), HttpStatus.BAD_REQUEST);
+    public ResponseEntity<ErrorDTO> handleBadCredentialsException(BadCredentialsException ex) {
+        return new ResponseEntity<>(ErrorDTO.builder().timestamp(new Date()).errorCode(401).errorMessage("Invalid username/password supplied").build(), HttpStatus.UNAUTHORIZED);
     }
 
     @ExceptionHandler(value = {AlreadyBookedException.class})
-    public ResponseEntity<StatusDTO> handleAlreadyBookedException(AlreadyBookedException ex) {
+    public ResponseEntity<ErrorDTO> handleAlreadyBookedException(AlreadyBookedException ex) {
         return new ResponseEntity<>(ex.getStatus(), HttpStatus.CONFLICT);
     }
 
     @ExceptionHandler(value = {NotEnoughFreeSpaceException.class})
-    public ResponseEntity<StatusDTO> handleNotEnoughFreeSpaceException(NotEnoughFreeSpaceException ex) {
+    public ResponseEntity<ErrorDTO> handleNotEnoughFreeSpaceException(NotEnoughFreeSpaceException ex) {
         return new ResponseEntity<>(ex.getStatus(), HttpStatus.CONFLICT);
     }
 

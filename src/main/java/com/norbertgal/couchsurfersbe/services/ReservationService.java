@@ -1,6 +1,6 @@
 package com.norbertgal.couchsurfersbe.services;
 
-import com.norbertgal.couchsurfersbe.api.v1.model.MessageDTO;
+import com.norbertgal.couchsurfersbe.api.v1.model.StatusDTO;
 import com.norbertgal.couchsurfersbe.api.v1.model.OwnReservationDTO;
 import com.norbertgal.couchsurfersbe.api.v1.model.OwnReservationPreviewDTO;
 import com.norbertgal.couchsurfersbe.api.v1.model.ReserveDTO;
@@ -17,5 +17,5 @@ public interface ReservationService {
 
     ReserveDTO bookCouch(ReservationRequestDTO reservationRequestDTO, Long userId) throws NotFoundException, AlreadyBookedException, NotEnoughFreeSpaceException, UnknownUserException;
 
-    MessageDTO cancelReservation(Long reservationId, Long userId) throws NotFoundException, TooLateToCancelReservationException, WrongIdentifierException;
+    StatusDTO cancelReservation(Long reservationId, Long userId) throws NotFoundException, TooLateToCancelReservationException, WrongIdentifierException;
 }

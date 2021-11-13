@@ -15,6 +15,7 @@ public class UserDetailsImpl implements UserDetails {
         this.user = user;
     }
 
+    @JsonIgnore
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return new HashSet<>();
@@ -35,21 +36,25 @@ public class UserDetailsImpl implements UserDetails {
         return user.getEmail();
     }
 
+    @JsonIgnore
     @Override
     public boolean isAccountNonExpired() {
         return true;
     }
 
+    @JsonIgnore
     @Override
     public boolean isAccountNonLocked() {
         return true;
     }
 
+    @JsonIgnore
     @Override
     public boolean isCredentialsNonExpired() {
         return true;
     }
 
+    @JsonIgnore
     @Override
     public boolean isEnabled() {
         return true;

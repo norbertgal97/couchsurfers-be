@@ -1,7 +1,6 @@
 package com.norbertgal.couchsurfersbe.services.dummy;
 
 import com.norbertgal.couchsurfersbe.api.v1.model.*;
-import com.norbertgal.couchsurfersbe.api.v1.model.exception.NotBookedException;
 import com.norbertgal.couchsurfersbe.api.v1.model.exception.NotFoundException;
 import com.norbertgal.couchsurfersbe.api.v1.model.exception.TooLateToCancelReservationException;
 import com.norbertgal.couchsurfersbe.api.v1.model.exception.WrongIdentifierException;
@@ -32,8 +31,8 @@ public class ReservationServiceDummy implements ReservationService {
     }
 
     @Override
-    public MessageDTO cancelReservation(Long userId, Long couchId) throws NotFoundException, TooLateToCancelReservationException {
-        return new MessageDTO(" ");
+    public StatusDTO cancelReservation(Long userId, Long couchId) throws NotFoundException, TooLateToCancelReservationException {
+        return new StatusDTO(" ");
     }
 
     private List<OwnReservationPreviewDTO> getOwnReservationDTOs() {

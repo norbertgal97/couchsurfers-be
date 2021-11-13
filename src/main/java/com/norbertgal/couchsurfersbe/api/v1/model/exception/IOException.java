@@ -1,6 +1,6 @@
 package com.norbertgal.couchsurfersbe.api.v1.model.exception;
 
-import com.norbertgal.couchsurfersbe.api.v1.model.StatusDTO;
+import com.norbertgal.couchsurfersbe.api.v1.model.ErrorDTO;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class IOException extends Exception {
-    StatusDTO status = new StatusDTO();
+    ErrorDTO status = new ErrorDTO();
 
     @Override
     public String getMessage() {

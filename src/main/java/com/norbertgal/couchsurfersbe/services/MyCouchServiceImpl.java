@@ -49,7 +49,7 @@ public class MyCouchServiceImpl implements MyCouchService {
     @Override
     public CouchDTO createCouch(CouchDTO couchDTO, long userId) throws NotFoundException, EmptyFieldsException, EntityAlreadyExistsException, UnknownUserException {
         if (!couchIsValid(couchDTO)) {
-            throw new EmptyFieldsException(StatusDTO.builder()
+            throw new EmptyFieldsException(ErrorDTO.builder()
                     .timestamp(new Date())
                     .errorCode(422)
                     .errorMessage("Empty fields!")
@@ -59,12 +59,12 @@ public class MyCouchServiceImpl implements MyCouchService {
         Optional<User> optionalUser = userRepository.findById(userId);
 
         if (optionalUser.isEmpty())
-            throw new UnknownUserException(StatusDTO.builder().timestamp(new Date()).errorCode(500).errorMessage("User is not found!").build());
+            throw new UnknownUserException(ErrorDTO.builder().timestamp(new Date()).errorCode(500).errorMessage("User is not found!").build());
 
         Optional<Couch> optionalCouch = couchRepository.findById(userId); // host_id
 
         if (optionalCouch.isPresent())
-            throw new EntityAlreadyExistsException(StatusDTO.builder().timestamp(new Date()).errorCode(409).errorMessage("A different object with the same identifier value was already associated with the session!").build());
+            throw new EntityAlreadyExistsException(ErrorDTO.builder().timestamp(new Date()).errorCode(409).errorMessage("A different object with the same identifier value was already associated with the session!").build());
 
         User user = optionalUser.get();
 
@@ -80,17 +80,17 @@ public class MyCouchServiceImpl implements MyCouchService {
     @Override
     public CouchDTO updateCouch(Map<String, Object> fields, long userId, Long couchId) throws NotFoundException, EmptyFieldsException, WrongIdentifierException {
         if (!couchMapIsValid(fields)) {
-            throw new EmptyFieldsException(StatusDTO.builder().timestamp(new Date()).errorCode(422).errorMessage("Empty fields!").build());
+            throw new EmptyFieldsException(ErrorDTO.builder().timestamp(new Date()).errorCode(422).errorMessage("Empty fields!").build());
         }
 
         if (userId != couchId) {
-            throw new WrongIdentifierException(StatusDTO.builder().timestamp(new Date()).errorCode(403).errorMessage("You can't access this resource!").build());
+            throw new WrongIdentifierException(ErrorDTO.builder().timestamp(new Date()).errorCode(403).errorMessage("You can't access this resource!").build());
         }
 
         Optional<Couch> optionalCouch = couchRepository.findById(couchId);
 
         if (optionalCouch.isEmpty()) {
-            throw new NotFoundException(StatusDTO.builder().timestamp(new Date()).errorCode(404).errorMessage("Couch is not found!").build());
+            throw new NotFoundException(ErrorDTO.builder().timestamp(new Date()).errorCode(404).errorMessage("Couch is not found!").build());
         }
 
         Couch couch = optionalCouch.get();
@@ -115,7 +115,7 @@ public class MyCouchServiceImpl implements MyCouchService {
         Optional<Couch> optionalCouch = couchRepository.findById(couchId);
 
         if (optionalCouch.isEmpty()) {
-            throw new NotFoundException(StatusDTO.builder().timestamp(new Date()).errorCode(404).errorMessage("Couch is not found!").build());
+            throw new NotFoundException(ErrorDTO.builder().timestamp(new Date()).errorCode(404).errorMessage("Couch is not found!").build());
         }
 
         return couchMapper.couchToCouchDTO(optionalCouch.get());
@@ -125,7 +125,7 @@ public class MyCouchServiceImpl implements MyCouchService {
         Optional<Couch> optionalCouch = couchRepository.findFirstByOrderByIdDesc();
 
         if (optionalCouch.isEmpty()) {
-            throw new NotFoundException(StatusDTO.builder().timestamp(new Date()).errorCode(404).errorMessage("Newest couch is not found!").build());
+            throw new NotFoundException(ErrorDTO.builder().timestamp(new Date()).errorCode(404).errorMessage("Newest couch is not found!").build());
         }
 
         return couchPreviewMapper.couchToCouchPreviewDTO(optionalCouch.get());
@@ -134,13 +134,13 @@ public class MyCouchServiceImpl implements MyCouchService {
     @Override
     public List<CouchPhotoDTO> uploadImages(Long couchId, MultipartFile[] images, Long userId) throws WrongIdentifierException, NotFoundException, EmptyFileException, IOException {
         if (!couchId.equals(userId)) {
-            throw new WrongIdentifierException(StatusDTO.builder().timestamp(new Date()).errorCode(403).errorMessage("You can't access this resource!").build());
+            throw new WrongIdentifierException(ErrorDTO.builder().timestamp(new Date()).errorCode(403).errorMessage("You can't access this resource!").build());
         }
 
         Optional<Couch> optionalCouch = couchRepository.findById(couchId);
 
         if (optionalCouch.isEmpty()) {
-            throw new NotFoundException(StatusDTO.builder().timestamp(new Date()).errorCode(404).errorMessage("Couch is not found!").build());
+            throw new NotFoundException(ErrorDTO.builder().timestamp(new Date()).errorCode(404).errorMessage("Couch is not found!").build());
         }
 
         List<CouchPhoto> couchPhotos = new ArrayList<>();
@@ -149,7 +149,7 @@ public class MyCouchServiceImpl implements MyCouchService {
             CouchPhoto couchPhoto = new CouchPhoto();
 
             if(image.isEmpty()) {
-                throw new EmptyFileException(StatusDTO.builder().timestamp(new Date()).errorCode(422).errorMessage("No file has been chosen or the chosen file has no content.").build());
+                throw new EmptyFileException(ErrorDTO.builder().timestamp(new Date()).errorCode(422).errorMessage("No file has been chosen or the chosen file has no content.").build());
             }
 
             try {
@@ -160,7 +160,7 @@ public class MyCouchServiceImpl implements MyCouchService {
                 couchPhotos.add(couchPhoto);
             } catch (java.io.IOException ex) {
                 throw new IOException(
-                        StatusDTO.builder()
+                        ErrorDTO.builder()
                         .timestamp(new Date())
                         .errorCode(422)
                         .errorMessage("Cannot read content of multipart files").build());
@@ -176,7 +176,7 @@ public class MyCouchServiceImpl implements MyCouchService {
         Optional<CouchPhoto> optionalCouchPhoto = couchPhotoRepository.findById(imageId);
 
         if (optionalCouchPhoto.isEmpty()) {
-            throw new NotFoundException(StatusDTO.builder().timestamp(new Date()).errorCode(404).errorMessage("Image is not found!").build());
+            throw new NotFoundException(ErrorDTO.builder().timestamp(new Date()).errorCode(404).errorMessage("Image is not found!").build());
         }
 
         CouchPhoto couchPhoto = optionalCouchPhoto.get();
@@ -185,16 +185,16 @@ public class MyCouchServiceImpl implements MyCouchService {
     }
 
     @Override
-    public MessageDTO deleteImages(Long couchId, FileDeleteDTO request, Long userId) throws  WrongIdentifierException {
+    public StatusDTO deleteImages(Long couchId, FileDeleteDTO request, Long userId) throws  WrongIdentifierException {
         if (!couchId.equals(userId)) {
-            throw new WrongIdentifierException(StatusDTO.builder().timestamp(new Date()).errorCode(403).errorMessage("You can't access this resource!").build());
+            throw new WrongIdentifierException(ErrorDTO.builder().timestamp(new Date()).errorCode(403).errorMessage("You can't access this resource!").build());
         }
 
         for (Long id : request.getIds()) {
             couchPhotoRepository.deleteById(id);
         }
 
-        return new MessageDTO("Images are successfully deleted!");
+        return new StatusDTO("Images are successfully deleted!");
     }
 
 

@@ -47,18 +47,18 @@ public class UserController {
         return new ResponseEntity<>(logoutDTO, HttpStatus.OK);
     }
 
-    @GetMapping(value = "/personalinformation")
+    @GetMapping(value = "/personal-information")
     public ResponseEntity<PersonalInformationDTO> getPersonalInformation(@AuthenticationPrincipal UserDetailsImpl userDetails) throws NotFoundException {
         PersonalInformationDTO personalInformation = userService.getPersonalInformation(userDetails.getUserId());
         return new ResponseEntity<>(personalInformation, HttpStatus.OK);
     }
 
-    @PatchMapping(value = "/personalinformation/{id}")
+    @PatchMapping(value = "/personal-information/{id}")
     public ResponseEntity<PersonalInformationDTO> updatePersonalInformation(@RequestBody PersonalInformationDTO request, @PathVariable("id") Long id, @AuthenticationPrincipal UserDetailsImpl userDetails) throws UnknownUserException, EmptyFieldsException, WrongIdentifierException {
         return new ResponseEntity<>(userService.updatePersonalInformation(request, userDetails.getUserId(), id), HttpStatus.OK);
     }
 
-    @GetMapping(value = "/profiledata")
+    @GetMapping(value = "/profile-data")
     public ResponseEntity<ProfileDataDTO> getProfileData(@AuthenticationPrincipal UserDetailsImpl userDetails) throws UnknownUserException {
         ProfileDataDTO profileData = userService.getProfileData(userDetails.getUserId());
         return new ResponseEntity<>(profileData, HttpStatus.OK);
@@ -78,7 +78,7 @@ public class UserController {
     }
 
     @DeleteMapping(value = "/images/{image_id}")
-    public ResponseEntity<MessageDTO> deleteImages(@PathVariable("image_id") Long photoId, @AuthenticationPrincipal UserDetailsImpl userDetails) throws WrongIdentifierException {
+    public ResponseEntity<StatusDTO> deleteImages(@PathVariable("image_id") Long photoId, @AuthenticationPrincipal UserDetailsImpl userDetails) throws WrongIdentifierException {
         return new ResponseEntity<>(userService.deleteImages(photoId, userDetails.getUserId()), HttpStatus.OK);
     }
 

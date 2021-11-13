@@ -54,12 +54,19 @@ public class User extends BaseEntity {
     )
     private List<Review> reviews = new ArrayList<>();
 
+    @OneToMany(
+            mappedBy = "user",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
+    private List<Message> messages = new ArrayList<>();
+
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
     @PrimaryKeyJoinColumn
     private Couch couch;
 
-    @OneToOne(mappedBy = "user")
-    private Message message;
+    @ManyToMany(mappedBy = "users")
+    List<ChatRoom> chatRooms = new ArrayList<>();
 
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
     @PrimaryKeyJoinColumn

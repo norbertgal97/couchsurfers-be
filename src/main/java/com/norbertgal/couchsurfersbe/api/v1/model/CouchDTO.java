@@ -30,6 +30,12 @@ public class CouchDTO {
 
     private LocationDTO location;
 
+    @JsonProperty("owner_name")
+    private String ownerName;
+
+    @JsonProperty("owner_email")
+    private String ownerEmail;
+
     @JsonProperty("couch_photos")
     private List<CouchPhotoDTO> couchPhotos;
 

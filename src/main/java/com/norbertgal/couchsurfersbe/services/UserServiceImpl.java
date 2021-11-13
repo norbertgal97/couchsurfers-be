@@ -8,8 +8,6 @@ import com.norbertgal.couchsurfersbe.api.v1.model.*;
 import com.norbertgal.couchsurfersbe.api.v1.model.exception.*;
 import com.norbertgal.couchsurfersbe.api.v1.model.request.LoginRequestDTO;
 import com.norbertgal.couchsurfersbe.api.v1.model.request.SignUpRequestDTO;
-import com.norbertgal.couchsurfersbe.domain.Couch;
-import com.norbertgal.couchsurfersbe.domain.CouchPhoto;
 import com.norbertgal.couchsurfersbe.domain.User;
 import com.norbertgal.couchsurfersbe.domain.UserPhoto;
 import com.norbertgal.couchsurfersbe.repositories.UserPhotoRepository;
@@ -77,7 +75,7 @@ public class UserServiceImpl implements UserService {
         Optional<User> optionalUser = userRepository.findById(userId);
 
         if (optionalUser.isEmpty())
-            throw new NotFoundException(StatusDTO.builder().timestamp(new Date()).errorCode(404).errorMessage("PersonalInformation is not found!").build());
+            throw new NotFoundException(ErrorDTO.builder().timestamp(new Date()).errorCode(404).errorMessage("PersonalInformation is not found!").build());
 
         return personalInformationMapper.toPersonalInformationDTO(optionalUser.get());
     }
@@ -85,17 +83,17 @@ public class UserServiceImpl implements UserService {
     @Override
     public PersonalInformationDTO updatePersonalInformation(PersonalInformationDTO personalInformationDTO, long userId, Long personalInformationId) throws UnknownUserException, EmptyFieldsException, WrongIdentifierException {
         if (personalInformationDTO.getFullName() == null || personalInformationDTO.getFullName().isEmpty()) {
-            throw new EmptyFieldsException(StatusDTO.builder().timestamp(new Date()).errorCode(422).errorMessage("Empty fields!").build());
+            throw new EmptyFieldsException(ErrorDTO.builder().timestamp(new Date()).errorCode(422).errorMessage("Empty fields!").build());
         }
 
         if (userId != personalInformationId) {
-            throw new WrongIdentifierException(StatusDTO.builder().timestamp(new Date()).errorCode(403).errorMessage("You can't access this resource!").build());
+            throw new WrongIdentifierException(ErrorDTO.builder().timestamp(new Date()).errorCode(403).errorMessage("You can't access this resource!").build());
         }
 
         Optional<User> optionalUser = userRepository.findById(userId);
 
         if (optionalUser.isEmpty()) {
-            throw new UnknownUserException(StatusDTO.builder().timestamp(new Date()).errorCode(500).errorMessage("User is not found!").build());
+            throw new UnknownUserException(ErrorDTO.builder().timestamp(new Date()).errorCode(500).errorMessage("User is not found!").build());
         }
 
         User user = optionalUser.get();
@@ -113,7 +111,7 @@ public class UserServiceImpl implements UserService {
         Optional<User> optionalUser = userRepository.findById(userId);
 
         if (optionalUser.isEmpty()) {
-            throw new UnknownUserException(StatusDTO.builder().timestamp(new Date()).errorCode(500).errorMessage("User is not found!").build());
+            throw new UnknownUserException(ErrorDTO.builder().timestamp(new Date()).errorCode(500).errorMessage("User is not found!").build());
         }
 
         return profileDataMapper.toProfileDataDTO(optionalUser.get());
@@ -124,13 +122,13 @@ public class UserServiceImpl implements UserService {
         Optional<User> optionalUser = userRepository.findById(userId);
 
         if (optionalUser.isEmpty()) {
-            throw new UnknownUserException(StatusDTO.builder().timestamp(new Date()).errorCode(500).errorMessage("User is not found!").build());
+            throw new UnknownUserException(ErrorDTO.builder().timestamp(new Date()).errorCode(500).errorMessage("User is not found!").build());
         }
 
         UserPhoto userPhoto = new UserPhoto();
 
         if (image.isEmpty()) {
-            throw new EmptyFileException(StatusDTO.builder().timestamp(new Date()).errorCode(422).errorMessage("No file has been chosen or the chosen file has no content.").build());
+            throw new EmptyFileException(ErrorDTO.builder().timestamp(new Date()).errorCode(422).errorMessage("No file has been chosen or the chosen file has no content.").build());
         }
 
         try {
@@ -140,7 +138,7 @@ public class UserServiceImpl implements UserService {
             userPhoto.setType(image.getContentType());
         } catch (java.io.IOException ex) {
             throw new IOException(
-                    StatusDTO.builder()
+                    ErrorDTO.builder()
                             .timestamp(new Date())
                             .errorCode(422)
                             .errorMessage("Cannot read content of multipart file").build());
@@ -153,16 +151,14 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public MessageDTO deleteImages(Long photoId, Long userId) throws WrongIdentifierException {
+    public StatusDTO deleteImages(Long photoId, Long userId) throws WrongIdentifierException {
         if (!photoId.equals(userId)) {
-            throw new WrongIdentifierException(StatusDTO.builder().timestamp(new Date()).errorCode(403).errorMessage("You can't access this resource!").build());
+            throw new WrongIdentifierException(ErrorDTO.builder().timestamp(new Date()).errorCode(403).errorMessage("You can't access this resource!").build());
         }
-
-        System.out.println("User photo id: " + photoId);
 
         userPhotoRepository.deleteWherePhotoIdIs(photoId);
 
-        return new MessageDTO("Image is successfully deleted!");
+        return new StatusDTO("Image is successfully deleted!");
     }
 
     @Override
@@ -170,7 +166,7 @@ public class UserServiceImpl implements UserService {
         Optional<UserPhoto> optionalUserPhoto = userPhotoRepository.findById(imageId);
 
         if (optionalUserPhoto.isEmpty()) {
-            throw new NotFoundException(StatusDTO.builder().timestamp(new Date()).errorCode(404).errorMessage("Image is not found!").build());
+            throw new NotFoundException(ErrorDTO.builder().timestamp(new Date()).errorCode(404).errorMessage("Image is not found!").build());
         }
 
         UserPhoto userPhoto = optionalUserPhoto.get();
@@ -184,7 +180,7 @@ public class UserServiceImpl implements UserService {
         Optional<User> optionalUser = userRepository.findUserByEmail(email);
 
         if (optionalUser.isEmpty())
-            throw new NotFoundException(StatusDTO.builder().timestamp(new Date()).errorCode(404).errorMessage("User is not found!").build());
+            throw new NotFoundException(ErrorDTO.builder().timestamp(new Date()).errorCode(404).errorMessage("User is not found!").build());
 
         return optionalUser.get();
     }
@@ -223,7 +219,7 @@ public class UserServiceImpl implements UserService {
         Optional<User> optionalUser = userRepository.findUserByEmail(user.getEmail());
 
         if (optionalUser.isPresent())
-            throw new AlreadyRegisteredEmailException(StatusDTO.builder().timestamp(new Date()).errorCode(409).errorMessage("You have already registered with this email address!").build());
+            throw new AlreadyRegisteredEmailException(ErrorDTO.builder().timestamp(new Date()).errorCode(409).errorMessage("You have already registered with this email address!").build());
 
         User registeredUser = userRepository.save(user);
         return userMapper.userToUserDTO(registeredUser);

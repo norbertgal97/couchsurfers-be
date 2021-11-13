@@ -15,8 +15,8 @@ import java.util.Date;
 @Table(name = "message")
 public class Message extends BaseEntity {
 
-    @Column(name = "message")
-    private String message;
+    @Column(name = "content")
+    private String content;
 
     @Column(name = "created_at")
     @CreationTimestamp
@@ -26,7 +26,7 @@ public class Message extends BaseEntity {
     @JoinColumn(name = "chat_room_id", nullable = false)
     private ChatRoom chatRoom;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "sender_id", nullable = false)
     private User user;
 
