@@ -37,9 +37,6 @@ public class User extends BaseEntity {
     @Column(name = "notification")
     private boolean notification;
 
-    @Embedded
-    private Location location;
-
     @OneToMany(
             mappedBy = "user",
             cascade = CascadeType.ALL,

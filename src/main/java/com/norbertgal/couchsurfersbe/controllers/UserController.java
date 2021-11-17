@@ -2,8 +2,8 @@ package com.norbertgal.couchsurfersbe.controllers;
 
 import com.norbertgal.couchsurfersbe.api.v1.model.*;
 import com.norbertgal.couchsurfersbe.api.v1.model.exception.*;
-import com.norbertgal.couchsurfersbe.api.v1.model.request.LoginRequestDTO;
-import com.norbertgal.couchsurfersbe.api.v1.model.request.SignUpRequestDTO;
+import com.norbertgal.couchsurfersbe.api.v1.model.LoginRequestDTO;
+import com.norbertgal.couchsurfersbe.api.v1.model.SignUpRequestDTO;
 import com.norbertgal.couchsurfersbe.services.UserService;
 import com.norbertgal.couchsurfersbe.services.authentication.UserDetailsImpl;
 import org.springframework.beans.factory.annotation.Autowired;

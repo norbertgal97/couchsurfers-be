@@ -1,4 +1,4 @@
-package com.norbertgal.couchsurfersbe.api.v1.model.request;
+package com.norbertgal.couchsurfersbe.api.v1.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;

@@ -10,6 +10,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class HostDTO {
 
-    @JsonProperty("hosted")
     private Boolean hosted;
+
+    @JsonProperty("language_code")
+    private String languageCode;
 }

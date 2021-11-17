@@ -1,11 +1,10 @@
 package com.norbertgal.couchsurfersbe.controllers;
 
-import com.norbertgal.couchsurfersbe.api.v1.model.CouchDTO;
 import com.norbertgal.couchsurfersbe.api.v1.model.ReviewDTO;
 import com.norbertgal.couchsurfersbe.api.v1.model.exception.EmptyFieldsException;
 import com.norbertgal.couchsurfersbe.api.v1.model.exception.NotFoundException;
 import com.norbertgal.couchsurfersbe.api.v1.model.exception.UnknownUserException;
-import com.norbertgal.couchsurfersbe.api.v1.model.request.ReviewRequestDTO;
+import com.norbertgal.couchsurfersbe.api.v1.model.ReviewRequestDTO;
 import com.norbertgal.couchsurfersbe.services.ReviewService;
 import com.norbertgal.couchsurfersbe.services.authentication.UserDetailsImpl;
 import org.springframework.http.HttpStatus;

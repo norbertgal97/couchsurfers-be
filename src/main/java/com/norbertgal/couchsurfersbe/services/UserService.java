@@ -2,8 +2,8 @@ package com.norbertgal.couchsurfersbe.services;
 
 import com.norbertgal.couchsurfersbe.api.v1.model.*;
 import com.norbertgal.couchsurfersbe.api.v1.model.exception.*;
-import com.norbertgal.couchsurfersbe.api.v1.model.request.LoginRequestDTO;
-import com.norbertgal.couchsurfersbe.api.v1.model.request.SignUpRequestDTO;
+import com.norbertgal.couchsurfersbe.api.v1.model.LoginRequestDTO;
+import com.norbertgal.couchsurfersbe.api.v1.model.SignUpRequestDTO;
 import com.norbertgal.couchsurfersbe.domain.User;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.userdetails.UserDetails;

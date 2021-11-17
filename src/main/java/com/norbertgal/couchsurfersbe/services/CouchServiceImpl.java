@@ -22,7 +22,7 @@ import java.util.*;
 
 @Profile("dev")
 @Service
-public class MyCouchServiceImpl implements MyCouchService {
+public class CouchServiceImpl implements CouchService {
 
     private final CouchRepository couchRepository;
     private final UserRepository userRepository;
@@ -32,12 +32,12 @@ public class MyCouchServiceImpl implements MyCouchService {
     private final CouchPreviewMapper couchPreviewMapper;
     private final CouchPhotoMapper couchPhotoMapper;
 
-    public MyCouchServiceImpl(CouchRepository couchRepository,
-                              UserRepository userRepository,
-                              CouchPhotoRepository couchPhotoRepository,
-                              CouchMapper couchMapper,
-                              CouchPreviewMapper couchPreviewMapper,
-                              CouchPhotoMapper couchPhotoMapper) {
+    public CouchServiceImpl(CouchRepository couchRepository,
+                            UserRepository userRepository,
+                            CouchPhotoRepository couchPhotoRepository,
+                            CouchMapper couchMapper,
+                            CouchPreviewMapper couchPreviewMapper,
+                            CouchPhotoMapper couchPhotoMapper) {
         this.couchRepository = couchRepository;
         this.userRepository = userRepository;
         this.couchPhotoRepository = couchPhotoRepository;
@@ -47,7 +47,7 @@ public class MyCouchServiceImpl implements MyCouchService {
     }
 
     @Override
-    public CouchDTO createCouch(CouchDTO couchDTO, long userId) throws NotFoundException, EmptyFieldsException, EntityAlreadyExistsException, UnknownUserException {
+    public CouchDTO createCouch(CouchDTO couchDTO, long userId) throws EmptyFieldsException, EntityAlreadyExistsException, UnknownUserException {
         if (!couchIsValid(couchDTO)) {
             throw new EmptyFieldsException(ErrorDTO.builder()
                     .timestamp(new Date())
@@ -111,7 +111,7 @@ public class MyCouchServiceImpl implements MyCouchService {
     }
 
     @Override
-    public CouchDTO getCouch(Long couchId, Long userId) throws NotFoundException {
+    public CouchDTO getCouch(Long couchId) throws NotFoundException {
         Optional<Couch> optionalCouch = couchRepository.findById(couchId);
 
         if (optionalCouch.isEmpty()) {

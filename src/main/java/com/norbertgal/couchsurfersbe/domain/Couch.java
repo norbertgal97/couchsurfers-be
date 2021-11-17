@@ -1,8 +1,7 @@
 package com.norbertgal.couchsurfersbe.domain;
 
 import com.sun.istack.NotNull;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 
 import javax.persistence.*;
@@ -11,7 +10,9 @@ import java.util.Date;
 import java.util.List;
 
 @Data
-@EqualsAndHashCode
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 @Entity
 @Table(name = "couch")
 public class Couch {

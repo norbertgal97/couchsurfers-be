@@ -1,6 +1,5 @@
 package com.norbertgal.couchsurfersbe.api.v1.mapper;
 
-
 import com.norbertgal.couchsurfersbe.api.v1.model.UserReservationDTO;
 import com.norbertgal.couchsurfersbe.domain.Reservation;
 import org.mapstruct.Mapper;

@@ -4,7 +4,7 @@ import com.norbertgal.couchsurfersbe.api.v1.model.*;
 import com.norbertgal.couchsurfersbe.api.v1.model.exception.NotFoundException;
 import com.norbertgal.couchsurfersbe.api.v1.model.exception.TooLateToCancelReservationException;
 import com.norbertgal.couchsurfersbe.api.v1.model.exception.WrongIdentifierException;
-import com.norbertgal.couchsurfersbe.api.v1.model.request.ReservationRequestDTO;
+import com.norbertgal.couchsurfersbe.api.v1.model.ReservationRequestDTO;
 import com.norbertgal.couchsurfersbe.services.ReservationService;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
@@ -56,19 +56,8 @@ public class ReservationServiceDummy implements ReservationService {
         locationDTO.setZipCode("1223");
         couchDTO.setLocation(locationDTO);
 
-        /*List<CouchPhotoDTO> couchPhotoDTOs = new ArrayList<>();
-        CouchPhotoDTO couchPhotoDTO = new CouchPhotoDTO();
-        couchPhotoDTO.setPhoto("asd12312141r152".getBytes());
-        couchPhotoDTOs.add(couchPhotoDTO);
-        couchDTO.setCouchPhotos(couchPhotoDTOs);
-        couchDTO.getCouchPhotos().add(couchPhotoDTO);*/
-
         reservation.setEndDate(new GregorianCalendar(2021, Calendar.FEBRUARY, 15).getTime());
         reservation.setStartDate(new GregorianCalendar(2021, Calendar.FEBRUARY, 11).getTime());
-        //reservation.setAmenities(couchDTO.getAmenities());
-        //reservation.setCouchPhoto(couchPhotoDTO);
-        //reservation.setLocation(couchDTO.getLocation());
-        //reservation.setRating(4.3);
 
         List<OwnReservationPreviewDTO> reservations = new ArrayList<>();
         reservations.add(reservation);

@@ -4,7 +4,7 @@ import com.norbertgal.couchsurfersbe.api.v1.mapper.OwnReservationMapper;
 import com.norbertgal.couchsurfersbe.api.v1.mapper.OwnReservationPreviewMapper;
 import com.norbertgal.couchsurfersbe.api.v1.model.*;
 import com.norbertgal.couchsurfersbe.api.v1.model.exception.*;
-import com.norbertgal.couchsurfersbe.api.v1.model.request.ReservationRequestDTO;
+import com.norbertgal.couchsurfersbe.api.v1.model.ReservationRequestDTO;
 import com.norbertgal.couchsurfersbe.domain.Couch;
 import com.norbertgal.couchsurfersbe.domain.Reservation;
 import com.norbertgal.couchsurfersbe.domain.User;

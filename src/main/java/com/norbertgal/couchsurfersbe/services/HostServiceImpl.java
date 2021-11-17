@@ -27,18 +27,21 @@ public class HostServiceImpl implements HostService {
     private final UserRepository userRepository;
     private final CouchRepository couchRepository;
     private final ReservationRepository reservationRepository;
+    private final PushNotificationService pushNotificationService;
 
     @Autowired
     public HostServiceImpl(OwnHostedCouchMapper ownHostedCouchMapper,
                            CouchPreviewMapper couchPreviewMapper,
                            UserRepository userRepository,
                            CouchRepository couchRepository,
-                           ReservationRepository reservationRepository) {
+                           ReservationRepository reservationRepository,
+                           PushNotificationService pushNotificationService) {
         this.ownHostedCouchMapper = ownHostedCouchMapper;
         this.couchPreviewMapper = couchPreviewMapper;
         this.userRepository = userRepository;
         this.couchRepository = couchRepository;
         this.reservationRepository = reservationRepository;
+        this.pushNotificationService = pushNotificationService;
     }
 
     @Override
@@ -97,6 +100,13 @@ public class HostServiceImpl implements HostService {
 
         Couch hostedCouch = couchRepository.save(couch);
 
+        if (hostedCouch.getHosted()) {
+            String title = "New Couch";
+            String body = hostedCouch.getUser().getFullName() + " hosted a couch!";
+
+            pushNotificationService.sendNotification(title, body);
+        }
+
         HostDTO response = new HostDTO();
         response.setHosted(hostedCouch.getHosted());
 
@@ -137,7 +147,7 @@ public class HostServiceImpl implements HostService {
                 notAvailableCouches.addAll(reservationRepository.queryReservedCouchesBetweenDates(notAvailableCouches, optionalUser.get().getId(), current, guests.longValue(), city));
             }
 
-            System.out.println("Not available couches: " + notAvailableCouches.toString());
+            System.out.println("Not available couches: " + notAvailableCouches);
 
             Calendar calendar = Calendar.getInstance();
             calendar.setTime(current);
@@ -151,5 +161,4 @@ public class HostServiceImpl implements HostService {
 
         return couchPreviewMapper.couchListToCouchPreviewDTOList(couchRepository.findAllByCityAndHostedAndEnoughSpace(notAvailableCouches, city, guests));
     }
-
 }

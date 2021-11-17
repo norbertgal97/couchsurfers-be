@@ -4,15 +4,12 @@ import com.norbertgal.couchsurfersbe.api.v1.mapper.ChatRoomMapper;
 import com.norbertgal.couchsurfersbe.api.v1.model.ChatRoomDTO;
 import com.norbertgal.couchsurfersbe.api.v1.model.ChatRoomRequestDTO;
 import com.norbertgal.couchsurfersbe.api.v1.model.ErrorDTO;
-import com.norbertgal.couchsurfersbe.api.v1.model.MessageDTO;
 import com.norbertgal.couchsurfersbe.api.v1.model.exception.EmptyFieldsException;
 import com.norbertgal.couchsurfersbe.api.v1.model.exception.NotFoundException;
 import com.norbertgal.couchsurfersbe.api.v1.model.exception.UnknownUserException;
 import com.norbertgal.couchsurfersbe.domain.ChatRoom;
-import com.norbertgal.couchsurfersbe.domain.Message;
 import com.norbertgal.couchsurfersbe.domain.User;
 import com.norbertgal.couchsurfersbe.repositories.ChatRoomRepository;
-import com.norbertgal.couchsurfersbe.repositories.MessageRepository;
 import com.norbertgal.couchsurfersbe.repositories.UserRepository;
 import org.springframework.stereotype.Service;
 
@@ -25,13 +22,11 @@ public class ChatRoomServiceImpl implements ChatRoomService {
 
     private final UserRepository userRepository;
     private final ChatRoomRepository chatRoomRepository;
-    private final MessageRepository messageRepository;
     private final ChatRoomMapper chatRoomMapper;
 
-    public ChatRoomServiceImpl(UserRepository userRepository, ChatRoomRepository chatRoomRepository, MessageRepository messageRepository, ChatRoomMapper chatRoomMapper) {
+    public ChatRoomServiceImpl(UserRepository userRepository, ChatRoomRepository chatRoomRepository, ChatRoomMapper chatRoomMapper) {
         this.userRepository = userRepository;
         this.chatRoomRepository = chatRoomRepository;
-        this.messageRepository = messageRepository;
         this.chatRoomMapper = chatRoomMapper;
     }
 

@@ -5,7 +5,7 @@ import com.norbertgal.couchsurfersbe.api.v1.model.OwnReservationDTO;
 import com.norbertgal.couchsurfersbe.api.v1.model.OwnReservationPreviewDTO;
 import com.norbertgal.couchsurfersbe.api.v1.model.ReserveDTO;
 import com.norbertgal.couchsurfersbe.api.v1.model.exception.*;
-import com.norbertgal.couchsurfersbe.api.v1.model.request.ReservationRequestDTO;
+import com.norbertgal.couchsurfersbe.api.v1.model.ReservationRequestDTO;
 
 import java.util.List;
 

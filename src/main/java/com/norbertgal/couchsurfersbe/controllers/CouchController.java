@@ -2,7 +2,7 @@ package com.norbertgal.couchsurfersbe.controllers;
 
 import com.norbertgal.couchsurfersbe.api.v1.model.*;
 import com.norbertgal.couchsurfersbe.api.v1.model.exception.*;
-import com.norbertgal.couchsurfersbe.services.MyCouchService;
+import com.norbertgal.couchsurfersbe.services.CouchService;
 import com.norbertgal.couchsurfersbe.services.authentication.UserDetailsImpl;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -15,39 +15,39 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping(MyCouchController.BASE_URL)
-public class MyCouchController {
+@RequestMapping(CouchController.BASE_URL)
+public class CouchController {
     public static final String BASE_URL = "/api/v1/couches";
 
-    private final MyCouchService myCouchService;
+    private final CouchService couchService;
 
-    public MyCouchController(MyCouchService myCouchService) {
-        this.myCouchService = myCouchService;
+    public CouchController(CouchService couchService) {
+        this.couchService = couchService;
     }
 
     @PostMapping(value = "/")
-    public ResponseEntity<CouchDTO> createCouch(@RequestBody CouchDTO request, @AuthenticationPrincipal UserDetailsImpl userDetails) throws NotFoundException, EmptyFieldsException, EntityAlreadyExistsException, UnknownUserException{
-        return new ResponseEntity<>(myCouchService.createCouch(request, userDetails.getUserId()), HttpStatus.CREATED);
+    public ResponseEntity<CouchDTO> createCouch(@RequestBody CouchDTO request, @AuthenticationPrincipal UserDetailsImpl userDetails) throws EmptyFieldsException, EntityAlreadyExistsException, UnknownUserException{
+        return new ResponseEntity<>(couchService.createCouch(request, userDetails.getUserId()), HttpStatus.CREATED);
     }
 
     @PatchMapping(value = "/{id}")
     public ResponseEntity<CouchDTO> updateCouch(@RequestBody Map<String, Object> fields, @PathVariable("id") Long id, @AuthenticationPrincipal UserDetailsImpl userDetails) throws NotFoundException, EmptyFieldsException, WrongIdentifierException {
-        return new ResponseEntity<>(myCouchService.updateCouch(fields, userDetails.getUserId(), id), HttpStatus.OK);
+        return new ResponseEntity<>(couchService.updateCouch(fields, userDetails.getUserId(), id), HttpStatus.OK);
     }
 
     @GetMapping(value = "/{id}")
-    public ResponseEntity<CouchDTO> getCouch(@PathVariable("id") Long id, @AuthenticationPrincipal UserDetailsImpl userDetails) throws NotFoundException {
-        return new ResponseEntity<>(myCouchService.getCouch(id, userDetails.getUserId()), HttpStatus.OK);
+    public ResponseEntity<CouchDTO> getCouch(@PathVariable("id") Long id) throws NotFoundException {
+        return new ResponseEntity<>(couchService.getCouch(id), HttpStatus.OK);
     }
 
     @GetMapping(value = "/newest")
     public ResponseEntity<CouchPreviewDTO> getNewestCouch() throws NotFoundException {
-        return new ResponseEntity<>(myCouchService.getNewestCouch(), HttpStatus.OK);
+        return new ResponseEntity<>(couchService.getNewestCouch(), HttpStatus.OK);
     }
 
     @PostMapping(value = "/{id}/images")
     public ResponseEntity<List<CouchPhotoDTO>> uploadImage(@PathVariable("id") Long id, @RequestParam("images") MultipartFile[] images, @AuthenticationPrincipal UserDetailsImpl userDetails) throws WrongIdentifierException, EmptyFileException, NotFoundException, IOException {
-        return new ResponseEntity<>(myCouchService.uploadImages(id, images, userDetails.getUserId()), HttpStatus.OK);
+        return new ResponseEntity<>(couchService.uploadImages(id, images, userDetails.getUserId()), HttpStatus.OK);
     }
 
     @GetMapping(value = "/{id}/images/{image_id}", produces = MediaType.IMAGE_JPEG_VALUE)
@@ -55,12 +55,12 @@ public class MyCouchController {
         return ResponseEntity
                 .ok()
                 .contentType(MediaType.IMAGE_JPEG)
-                .body(myCouchService.downloadImage(couchId, imageId, userDetails.getUserId()));
+                .body(couchService.downloadImage(couchId, imageId, userDetails.getUserId()));
     }
 
     @DeleteMapping(value = "/{id}/images")
     public ResponseEntity<StatusDTO> deleteImages(@PathVariable("id") Long couchId, @RequestBody FileDeleteDTO request, @AuthenticationPrincipal UserDetailsImpl userDetails) throws NotFoundException, WrongIdentifierException {
-        return new ResponseEntity<>(myCouchService.deleteImages(couchId, request, userDetails.getUserId()), HttpStatus.OK);
+        return new ResponseEntity<>(couchService.deleteImages(couchId, request, userDetails.getUserId()), HttpStatus.OK);
     }
 
 }

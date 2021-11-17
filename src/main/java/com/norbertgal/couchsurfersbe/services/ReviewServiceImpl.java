@@ -6,7 +6,7 @@ import com.norbertgal.couchsurfersbe.api.v1.model.ErrorDTO;
 import com.norbertgal.couchsurfersbe.api.v1.model.exception.EmptyFieldsException;
 import com.norbertgal.couchsurfersbe.api.v1.model.exception.NotFoundException;
 import com.norbertgal.couchsurfersbe.api.v1.model.exception.UnknownUserException;
-import com.norbertgal.couchsurfersbe.api.v1.model.request.ReviewRequestDTO;
+import com.norbertgal.couchsurfersbe.api.v1.model.ReviewRequestDTO;
 import com.norbertgal.couchsurfersbe.domain.Couch;
 import com.norbertgal.couchsurfersbe.domain.Review;
 import com.norbertgal.couchsurfersbe.domain.User;

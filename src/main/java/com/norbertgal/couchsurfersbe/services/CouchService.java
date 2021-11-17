@@ -7,12 +7,12 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 import java.util.Map;
 
-public interface MyCouchService {
-    CouchDTO createCouch(CouchDTO couchDTO, long userId) throws NotFoundException, EmptyFieldsException, EntityAlreadyExistsException, UnknownUserException;
+public interface CouchService {
+    CouchDTO createCouch(CouchDTO couchDTO, long userId) throws EmptyFieldsException, EntityAlreadyExistsException, UnknownUserException;
 
     CouchDTO updateCouch(Map<String, Object> fields, long userId, Long couchId) throws NotFoundException, EmptyFieldsException, WrongIdentifierException;
 
-    CouchDTO getCouch(Long couchId, Long userId) throws NotFoundException;
+    CouchDTO getCouch(Long couchId) throws NotFoundException;
 
     CouchPreviewDTO getNewestCouch() throws NotFoundException;
 

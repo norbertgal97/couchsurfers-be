@@ -2,7 +2,7 @@ package com.norbertgal.couchsurfersbe.controllers;
 
 import com.norbertgal.couchsurfersbe.api.v1.model.*;
 import com.norbertgal.couchsurfersbe.api.v1.model.exception.*;
-import com.norbertgal.couchsurfersbe.api.v1.model.request.ReservationRequestDTO;
+import com.norbertgal.couchsurfersbe.api.v1.model.ReservationRequestDTO;
 import com.norbertgal.couchsurfersbe.services.ReservationService;
 import com.norbertgal.couchsurfersbe.services.authentication.UserDetailsImpl;
 import org.springframework.http.HttpStatus;
