@@ -4,6 +4,7 @@ import com.norbertgal.couchsurfersbe.api.v1.model.*;
 import com.norbertgal.couchsurfersbe.api.v1.model.exception.*;
 import com.norbertgal.couchsurfersbe.services.CouchService;
 import com.norbertgal.couchsurfersbe.services.authentication.UserDetailsImpl;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -21,6 +22,7 @@ public class CouchController {
 
     private final CouchService couchService;
 
+    @Autowired
     public CouchController(CouchService couchService) {
         this.couchService = couchService;
     }

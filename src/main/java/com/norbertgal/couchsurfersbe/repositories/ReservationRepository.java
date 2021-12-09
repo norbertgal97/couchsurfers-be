@@ -8,7 +8,6 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Date;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 
 @Repository
@@ -16,13 +15,21 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
 
     List<Reservation> findByUserId(Long userId);
 
-    @Query(value = "SELECT SUM(r.numberOfGuests) FROM Reservation r WHERE r.couch.id = :couchId AND r.startDate <= :onDate AND r.endDate > :onDate")
-    Integer queryNumberOfGuestsOnSpecificDate(@Param("couchId") Long couchId, @Param("onDate") Date onDate);
+    @Query(value = "SELECT SUM(r.numberOfGuests) FROM Reservation r " +
+            "WHERE r.couch.id = :couchId " +
+            "AND r.startDate <= :onDate " +
+            "AND r.endDate > :onDate")
+    Integer queryNumberOfGuestsOnSpecificDate(@Param("couchId") Long couchId,
+                                              @Param("onDate") Date onDate);
 
-    Optional<Reservation> findByUserIdAndCouchId(Long userId, Long couchId);
-
-    @Query(value = "SELECT r.id FROM Reservation r WHERE r.user.id = :userId AND r.couch.id = :couchId AND r.startDate <= :onDate AND r.endDate > :onDate")
-    List<Long> queryOwnReservationsBetweenDates(@Param("userId") Long userId, @Param("couchId") Long couchId, @Param("onDate") Date onDate);
+    @Query(value = "SELECT r.id FROM Reservation r " +
+            "WHERE r.user.id = :userId " +
+            "AND r.couch.id = :couchId " +
+            "AND r.startDate <= :onDate " +
+            "AND r.endDate > :onDate")
+    List<Long> queryOwnReservationsBetweenDates(@Param("userId") Long userId,
+                                                @Param("couchId") Long couchId,
+                                                @Param("onDate") Date onDate);
 
     @Query(value = "SELECT c.id FROM Couch c WHERE c.id IN (SELECT r.couch.id FROM Reservation r " +
             "WHERE r.couch.id NOT IN :couchIds " +
